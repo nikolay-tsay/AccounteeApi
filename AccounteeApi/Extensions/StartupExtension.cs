@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace AccounteeApi.Extensions;
 
@@ -73,6 +76,27 @@ public static class StartupExtension
                 x => x.MigrationsAssembly("AccounteeApi"));
         });
         
+        builder.Services.AddControllers().AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
+            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+        });
+
+        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            Converters = new List<JsonConverter>
+            {
+                new StringEnumConverter(new CamelCaseNamingStrategy()),
+            },
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc
+        };
+
+        builder.Services.AddSwaggerGenNewtonsoftSupport();
+        
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)    
             .AddJwtBearer(options =>    
             {    
@@ -88,9 +112,14 @@ public static class StartupExtension
                 };    
             });
 
+        builder.Services.AddHttpContextAccessor();
+        
         builder.Services.AddScoped<IAuthPrivateService, AuthPrivateService>();
         builder.Services.AddScoped<IPasswordHandler, PasswordHandler>();
+        builder.Services.AddScoped<ICurrentUserPrivateService, CurrentUserPrivateService>();
+        
         builder.Services.AddScoped<IAuthPublicService, AuthPublicService>();
+        builder.Services.AddScoped<ICompanyPublicService, CompanyPublicService>();
     }
 
     public static void SetupPipeline(this WebApplication app)

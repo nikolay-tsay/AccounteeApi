@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
     [Authorize]
     [HttpPut("Auth/ChangePassword")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ChangePassword([FromQuery] int userId, string oldPwd, string newPwd, CancellationToken cancellationToken)
+    public async Task<IActionResult> ChangePassword([FromQuery] int? userId, string oldPwd, string newPwd, CancellationToken cancellationToken)
     {
         var result = await AuthPublicService.ChangePassword(userId, oldPwd, newPwd, cancellationToken);
 

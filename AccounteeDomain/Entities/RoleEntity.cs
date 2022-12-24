@@ -15,6 +15,8 @@ public class RoleEntity
 
     public bool IsAdmin { get; set; }
     public bool CanCreateCompany { get; set; }
+    public bool CanEditCompany { get; set; }
+    public bool CanDeleteCompany { get; set; }
     public bool CanRead { get; set; }
     public bool CanCreate { get; set; }
     public bool CanEdit { get; set; }

@@ -24,7 +24,7 @@ public class AccounteeContext : DbContext
             .HasMany<UserEntity>(x => x.UserList)
             .WithOne(x => x.Company)
             .HasForeignKey(x => x.IdCompany)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<UserEntity>()
             .HasOne<RoleEntity>(x => x.Role)

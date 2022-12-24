@@ -13,17 +13,19 @@ namespace AccounteeService.PublicServices;
 
 public class AuthPublicService : IAuthPublicService
 {
+    private ICurrentUserPrivateService CurrentUserPrivateService { get; }
     private AccounteeContext AccounteeContext { get; }
     private IAuthPrivateService AuthPrivateService { get; }
     private IPasswordHandler PasswordHandler { get; }
     private IMapper Mapper { get; }
 
-    public AuthPublicService(AccounteeContext accounteeContext, IAuthPrivateService authPrivateService, IMapper mapper, IPasswordHandler passwordHandler)
+    public AuthPublicService(AccounteeContext accounteeContext, IAuthPrivateService authPrivateService, IMapper mapper, IPasswordHandler passwordHandler, ICurrentUserPrivateService currentUserPrivateService)
     {
         AccounteeContext = accounteeContext;
         AuthPrivateService = authPrivateService;
         Mapper = mapper;
         PasswordHandler = passwordHandler;
+        CurrentUserPrivateService = currentUserPrivateService;
     }
     
     public async Task<string> Login(string login, string password, CancellationToken cancellationToken)
@@ -78,8 +80,13 @@ public class AuthPublicService : IAuthPublicService
         return mapped;
     }
 
-    public async Task<bool> ChangePassword(int userId, string oldPwd, string newPwd, CancellationToken cancellationToken)
+    public async Task<bool> ChangePassword(int? userId, string oldPwd, string newPwd, CancellationToken cancellationToken)
     {
+        if (userId == null)
+        {
+            userId = CurrentUserPrivateService.GetCurrentUserId();
+        }
+
         var user = await AccounteeContext.Users
             .Where(x => x.Id == userId)
             .FirstOrNotFound(cancellationToken);
