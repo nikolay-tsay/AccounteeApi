@@ -37,16 +37,32 @@ public class CurrentUserPrivateService : ICurrentUserPrivateService
 
     public void CheckUserRights(UserEntity user,UserRights toCheck)
     {
+        if (user.Role.IsAdmin)
+        {
+            return;
+        }
+        
         bool hasRight = toCheck switch
         {
-            UserRights.IsAdmin => user.Role.IsAdmin,
             UserRights.CanCreateCompany => user.Role.CanCreateCompany,
             UserRights.CanEditCompany => user.Role.CanEditCompany,
             UserRights.CanDeleteCompany => user.Role.CanDeleteCompany,
-            UserRights.CanRead => user.Role.CanRead,
-            UserRights.CanCreate => user.Role.CanCreate,
-            UserRights.CanEdit => user.Role.CanEdit,
-            UserRights.CanDelete => user.Role.CanDelete,
+            
+            UserRights.CanReadUsers => user.Role.CanReadUsers,
+            UserRights.CanRegisterUsers => user.Role.CanRegisterUsers,
+            UserRights.CanDeleteUsers => user.Role.CanDeleteUsers,
+            UserRights.CanEditUsers => user.Role.CanEditUsers,
+            
+            UserRights.CanReadRoles => user.Role.CanReadRoles,
+            UserRights.CanCreateRoles => user.Role.CanCreateRoles,
+            UserRights.CanEditRoles => user.Role.CanEditRoles,
+            UserRights.CanDeleteRoles => user.Role.CanDeleteRoles,
+            
+            UserRights.CanReadOutlay => user.Role.CanReadOutlay,
+            UserRights.CanCreateOutlay => user.Role.CanCreateOutlay,
+            UserRights.CanEditOutlay => user.Role.CanEditOutlay,
+            UserRights.CanDeleteOutlay => user.Role.CanDeleteOutlay,
+            
             UserRights.CanUploadFiles => user.Role.CanUploadFiles,
             _ => false
         };
@@ -60,24 +76,7 @@ public class CurrentUserPrivateService : ICurrentUserPrivateService
     public async Task CheckCurrentUserRights(UserRights toCheck, CancellationToken cancellationToken)
     {
         var user = await GetCurrentUser(cancellationToken);
-        bool hasRight = toCheck switch
-        {
-            UserRights.IsAdmin => user.Role.IsAdmin,
-            UserRights.CanCreateCompany => user.Role.CanCreateCompany,
-            UserRights.CanEditCompany => user.Role.CanEditCompany,
-            UserRights.CanDeleteCompany => user.Role.CanDeleteCompany,
-            UserRights.CanRead => user.Role.CanRead,
-            UserRights.CanCreate => user.Role.CanCreate,
-            UserRights.CanEdit => user.Role.CanEdit,
-            UserRights.CanDelete => user.Role.CanDelete,
-            UserRights.CanUploadFiles => user.Role.CanUploadFiles,
-            _ => false
-        };
-
-        if (!hasRight)
-        {
-            throw new AccounteeUnauthorizedException();
-        }
+        CheckUserRights(user, toCheck);
     }
 
     public int GetCurrentUserId()

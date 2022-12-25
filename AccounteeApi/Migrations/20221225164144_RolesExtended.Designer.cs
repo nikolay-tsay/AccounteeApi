@@ -3,6 +3,7 @@ using System;
 using AccounteeDomain.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccounteeApi.Migrations
 {
     [DbContext(typeof(AccounteeContext))]
-    partial class AccounteeContextModelSnapshot : ModelSnapshot
+    [Migration("20221225164144_RolesExtended")]
+    partial class RolesExtended
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

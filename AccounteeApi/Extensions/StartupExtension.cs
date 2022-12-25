@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using AccounteeApi.Middleware;
 using AccounteeCommon.Options;
 using AccounteeDomain.Contexts;
 using AccounteeService.Mapping;
@@ -18,9 +19,16 @@ namespace AccounteeApi.Extensions;
 
 public static class StartupExtension
 {
-    public static void AddServices(this WebApplicationBuilder builder)
+    public static void ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
+            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+        });
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(x =>
         {
@@ -75,14 +83,6 @@ public static class StartupExtension
             opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"), 
                 x => x.MigrationsAssembly("AccounteeApi"));
         });
-        
-        builder.Services.AddControllers().AddNewtonsoftJson(options =>
-        {
-            options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
-            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-        });
 
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
@@ -112,14 +112,7 @@ public static class StartupExtension
                 };    
             });
 
-        builder.Services.AddHttpContextAccessor();
-        
-        builder.Services.AddScoped<IAuthPrivateService, AuthPrivateService>();
-        builder.Services.AddScoped<IPasswordHandler, PasswordHandler>();
-        builder.Services.AddScoped<ICurrentUserPrivateService, CurrentUserPrivateService>();
-        
-        builder.Services.AddScoped<IAuthPublicService, AuthPublicService>();
-        builder.Services.AddScoped<ICompanyPublicService, CompanyPublicService>();
+        builder.AddServices();
     }
 
     public static void SetupPipeline(this WebApplication app)
@@ -129,10 +122,26 @@ public static class StartupExtension
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+        
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+    }
+
+    private static void AddServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddHttpContextAccessor();
+        
+        builder.Services.AddScoped<IAuthPrivateService, AuthPrivateService>();
+        builder.Services.AddScoped<IPasswordHandler, PasswordHandler>();
+        builder.Services.AddScoped<ICurrentUserPrivateService, CurrentUserPrivateService>();
+        
+        builder.Services.AddScoped<IAuthPublicService, AuthPublicService>();
+        builder.Services.AddScoped<ICompanyPublicService, CompanyPublicService>();
+        builder.Services.AddScoped<IUserPublicService, UserPublicService>();
+        builder.Services.AddScoped<IRolePublicService, RolePublicService>();
     }
 }

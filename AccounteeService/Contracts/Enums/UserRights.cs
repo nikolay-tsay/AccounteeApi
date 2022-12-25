@@ -6,9 +6,20 @@ public enum UserRights
     CanCreateCompany,
     CanEditCompany,
     CanDeleteCompany,
-    CanRead,
-    CanCreate,
-    CanEdit,
-    CanDelete,
+    
+    CanReadUsers,
+    CanRegisterUsers,
+    CanEditUsers,
+    CanDeleteUsers,
+    
+    CanReadRoles,
+    CanCreateRoles,
+    CanEditRoles,
+    CanDeleteRoles,
+    
+    CanReadOutlay,
+    CanCreateOutlay,
+    CanEditOutlay,
+    CanDeleteOutlay,
     CanUploadFiles 
 }

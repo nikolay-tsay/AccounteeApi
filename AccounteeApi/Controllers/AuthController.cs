@@ -29,9 +29,9 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [HttpPost("Auth/Register")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> RegisterUser([FromBody] RegistrationRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Register([FromBody] RegistrationRequest request, CancellationToken cancellationToken)
     {
-        var result = await AuthPublicService.RegisterUser(request, cancellationToken);
+        var result = await AuthPublicService.Register(request, cancellationToken);
 
         return Ok(result);
     }

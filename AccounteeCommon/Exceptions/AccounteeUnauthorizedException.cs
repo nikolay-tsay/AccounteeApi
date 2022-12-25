@@ -1,6 +1,13 @@
-﻿namespace AccounteeCommon.Exceptions;
+﻿using Microsoft.AspNetCore.Http;
 
-public class AccounteeUnauthorizedException : Exception
+namespace AccounteeCommon.Exceptions;
+
+public class AccounteeUnauthorizedException : AccounteeException
 {
     public AccounteeUnauthorizedException(string? message = null) : base(message) { }
+
+    public override int GetStatusCode()
+    {
+        return StatusCodes.Status401Unauthorized;
+    }
 }

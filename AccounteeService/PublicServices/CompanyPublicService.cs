@@ -27,7 +27,11 @@ public class CompanyPublicService : ICompanyPublicService
     public async Task<CompanyDto> GetCompany(CancellationToken cancellationToken)
     {
         var user = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-
+        if (user.Company == null)
+        {
+            throw new AccounteeNotFoundException();
+        }
+        
         var mapped = Mapper.Map<CompanyDto>(user.Company);
         return mapped;
     }
@@ -114,15 +118,7 @@ public class CompanyPublicService : ICompanyPublicService
         {
             Company = company,
             Name = "Owner",
-            IsAdmin = true,
-            CanCreate = true,
-            CanDelete = true,
-            CanEdit = true,
-            CanRead = true,
-            CanCreateCompany = false,
-            CanEditCompany = true,
-            CanDeleteCompany = true,
-            CanUploadFiles = true
+            IsAdmin = true
         };
 
         await AccounteeContext.Roles.AddAsync(newRole, cancellationToken);

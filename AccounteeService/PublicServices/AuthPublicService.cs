@@ -45,7 +45,7 @@ public class AuthPublicService : IAuthPublicService
         return token;
     }
 
-    public async Task<UserDto> RegisterUser(RegistrationRequest request, CancellationToken cancellationToken)
+    public async Task<UserDto> Register(RegistrationRequest request, CancellationToken cancellationToken)
     {
         var exists = await AccounteeContext.Users
             .Where(x => x.Login == request.Login)
@@ -60,10 +60,7 @@ public class AuthPublicService : IAuthPublicService
         
         var newUser = new UserEntity
         {
-            IdCompany = request.IdCompany,
-            IdRole = request.IdCompany == null 
-                ? 1 
-                : request.IdRole,
+            IdRole = 1,
             Login = request.Login,
             PasswordHash = hash,
             PasswordSalt = salt,
