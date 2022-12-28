@@ -32,10 +32,10 @@ public class UserPublicService : IUserPublicService
         var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
         CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanReadUsers);
         
-        var users = AccounteeContext.Users
+        var users = await AccounteeContext.Users
             .AsNoTracking()
             .Where(x => x.IdCompany == currentUser.IdCompany)
-            .ToPagedList(filter.PageNum, filter.PageSize);
+            .ToPagedList(filter, cancellationToken);
         
         var mapped = Mapper.Map<PagedList<UserEntity>, PagedList<UserDto>>(users);
 

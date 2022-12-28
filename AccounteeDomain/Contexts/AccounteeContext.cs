@@ -8,6 +8,7 @@ public class AccounteeContext : DbContext
     public DbSet<UserEntity> Users { get; set; } = null!;
     public DbSet<CompanyEntity> Companies { get; set; } = null!;
     public DbSet<RoleEntity> Roles { get; set; } = null!;
+    
     public AccounteeContext(DbContextOptions<AccounteeContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,10 +31,14 @@ public class AccounteeContext : DbContext
             .HasOne<RoleEntity>(x => x.Role)
             .WithMany(x => x.UserList)
             .HasForeignKey(x => x.IdRole)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<UserEntity>()
-            .HasIndex(x => x.Login)
+            .HasIndex(x => new { x.IdCompany, x.Login })
+            .IsUnique();
+
+        modelBuilder.Entity<RoleEntity>()
+            .HasIndex(x => new { x.IdCompany, x.Name })
             .IsUnique();
 
         modelBuilder.Entity<RoleEntity>()

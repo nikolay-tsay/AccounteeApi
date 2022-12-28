@@ -32,21 +32,22 @@ public static class QueryExtension
         return list;
     }
     
-    public static PagedList<T> ToPagedList<T>(this IQueryable<T> source, int pageIndex, int pageSize)
+    public static async Task<PagedList<T>> ToPagedList<T>(this IQueryable<T> source, PageFilter filter, CancellationToken cancellationToken)
     {
         var paged = new PagedList<T>
         {
-            PageIndex = pageIndex,
-            PageSize = pageSize,
+            PageNum = filter.PageNum,
+            PageSize = filter.PageSize,
             TotalCount = source.Count()
         };
         paged.TotalPages = (int) Math.Ceiling(paged.TotalCount / (double) paged.PageSize);
         
-        paged.Items = source
-            .Skip(paged.PageIndex > 1 
-                ? paged.PageIndex * paged.PageSize 
+        paged.Items = await source
+            .Skip(paged.PageNum > 1 
+                ? paged.PageNum * paged.PageSize 
                 : 0)
-            .Take(paged.PageSize);
+            .Take(paged.PageSize)
+            .ToListAsync(cancellationToken);
 
         return paged;
     }
