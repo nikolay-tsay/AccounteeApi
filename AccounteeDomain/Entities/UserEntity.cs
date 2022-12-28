@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AccounteeDomain.Entities.Base;
+using AccounteeDomain.Entities.Relational;
 
 namespace AccounteeDomain.Entities;
 
-public class UserEntity
+public class UserEntity : IBaseWithCompany
 {
     [Key]
     public int Id { get; set; }
@@ -30,6 +32,11 @@ public class UserEntity
     [MaxLength(20)]
     public string? PhoneNumber { get; set; }
 
+    public decimal? IncomePercent { get; set; }
+
     public CompanyEntity? Company { get; set; }
     public RoleEntity Role { get; set; } = null!;
+    
+    public IEnumerable<UserIncomeEntity>? UserIncomeList { get; set; }
+    public IEnumerable<UserServiceEntity>? UserServiceList { get; set; }
 }

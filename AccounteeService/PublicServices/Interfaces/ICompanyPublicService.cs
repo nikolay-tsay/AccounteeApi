@@ -8,4 +8,5 @@ public interface ICompanyPublicService
     Task<CompanyDto> CreateCompany(CompanyDto model, CancellationToken cancellationToken);
     Task<bool> DeleteCompany(CancellationToken cancellationToken);
     Task<CompanyDto> EditCompany(CompanyDto model, CancellationToken cancellationToken);
+    Task<CompanyDto> EditBudget(decimal value, CancellationToken cancellationToken);
 }

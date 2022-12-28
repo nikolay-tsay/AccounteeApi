@@ -1,4 +1,5 @@
 ﻿using AccounteeCommon.Exceptions;
+using AccounteeCommon.HttpContexts;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
@@ -30,6 +31,8 @@ public class AuthPublicService : IAuthPublicService
     
     public async Task<string> Login(string login, string password, CancellationToken cancellationToken)
     {
+        GlobalHttpContext.SetIgnoreCompanyFilter(true);
+        
         var user = await AccounteeContext.Users
             .AsNoTracking()
             .Where(x => x.Login == login)
@@ -41,12 +44,21 @@ public class AuthPublicService : IAuthPublicService
             throw new AccounteeUnauthorizedException();
         }
 
+        if (user.IdCompany != null)
+        {
+            GlobalHttpContext.SetCompanyId(user.IdCompany.Value);
+        }
+        
         var token = AuthPrivateService.GetJwtToken(user, cancellationToken);
+        
+        GlobalHttpContext.SetIgnoreCompanyFilter(false);
         return token;
     }
 
     public async Task<UserDto> Register(RegistrationRequest request, CancellationToken cancellationToken)
     {
+        GlobalHttpContext.SetIgnoreCompanyFilter(true);
+        
         var exists = await AccounteeContext.Users
             .Where(x => x.Login == request.Login)
             .AnyAsync(cancellationToken);
@@ -74,6 +86,8 @@ public class AuthPublicService : IAuthPublicService
         await AccounteeContext.SaveChangesAsync(cancellationToken);
         
         var mapped = Mapper.Map<UserDto>(newUser);
+        
+        GlobalHttpContext.SetIgnoreCompanyFilter(false);
         return mapped;
     }
 

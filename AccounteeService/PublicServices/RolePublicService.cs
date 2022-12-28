@@ -1,9 +1,9 @@
-﻿using AccounteeCommon.Exceptions;
+﻿using AccounteeCommon.Enums;
+using AccounteeCommon.Exceptions;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
 using AccounteeService.Contracts;
-using AccounteeService.Contracts.Enums;
 using AccounteeService.Extensions;
 using AccounteeService.PrivateServices.Interfaces;
 using AccounteeService.PublicServices.Interfaces;
@@ -27,12 +27,10 @@ public class RolePublicService : IRolePublicService
 
     public async Task<PagedList<RoleDto>> GetRoles(PageFilter filter, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanReadRoles);
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadRoles, cancellationToken);
 
         var roles = await AccounteeContext.Roles
             .AsNoTracking()
-            .Where(x => x.IdCompany == currentUser.IdCompany)
             .ToPagedList(filter, cancellationToken);
         
         var mapped = Mapper.Map<PagedList<RoleEntity>, PagedList<RoleDto>>(roles);
@@ -42,12 +40,10 @@ public class RolePublicService : IRolePublicService
 
     public async Task<RoleDto> GetRoleById(int roleId, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanReadRoles);
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadRoles, cancellationToken);
 
         var role = await AccounteeContext.Roles
             .AsNoTracking()
-            .Where(x => x.IdCompany == currentUser.IdCompany)
             .Where(x => x.Id == roleId)
             .FirstOrNotFound(cancellationToken);
 
@@ -95,11 +91,9 @@ public class RolePublicService : IRolePublicService
 
     public async Task<RoleDto> EditRole(int roleId, RoleDto model, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanEditRoles);
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanEditRoles, cancellationToken);
 
         var role = await AccounteeContext.Roles
-            .Where(x => x.IdCompany == currentUser.IdCompany)
             .Where(x => x.Id == roleId)
             .FirstOrNotFound(cancellationToken);
 
@@ -127,11 +121,9 @@ public class RolePublicService : IRolePublicService
 
     public async Task<bool> DeleteRole(int roleId, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanDeleteRoles);
-
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanDeleteCompany, cancellationToken);
+        
         var role = await AccounteeContext.Roles
-            .Where(x => x.IdCompany == currentUser.IdCompany)
             .Where(x => x.Id == roleId)
             .FirstOrNotFound(cancellationToken);
 

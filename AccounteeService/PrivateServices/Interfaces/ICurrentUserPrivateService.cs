@@ -1,5 +1,5 @@
-﻿using AccounteeDomain.Entities;
-using AccounteeService.Contracts.Enums;
+﻿using AccounteeCommon.Enums;
+using AccounteeDomain.Entities;
 
 namespace AccounteeService.PrivateServices.Interfaces;
 

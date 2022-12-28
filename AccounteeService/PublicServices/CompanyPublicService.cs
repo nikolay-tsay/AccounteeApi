@@ -1,8 +1,9 @@
-﻿using AccounteeCommon.Exceptions;
+﻿using AccounteeCommon.Enums;
+using AccounteeCommon.Exceptions;
+using AccounteeCommon.HttpContexts;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
-using AccounteeService.Contracts.Enums;
 using AccounteeService.Extensions;
 using AccounteeService.PrivateServices.Interfaces;
 using AccounteeService.PublicServices.Interfaces;
@@ -31,13 +32,15 @@ public class CompanyPublicService : ICompanyPublicService
         {
             throw new AccounteeNotFoundException();
         }
-        
+
         var mapped = Mapper.Map<CompanyDto>(user.Company);
         return mapped;
     }
 
     public async Task<CompanyDto> CreateCompany(CompanyDto model, CancellationToken cancellationToken)
     {
+        GlobalHttpContext.SetIgnoreCompanyFilter(true);
+        
         var userId = CurrentUserPrivateService.GetCurrentUserId();
         var user = await AccounteeContext.Users
             .Include(x => x.Role)
@@ -57,10 +60,13 @@ public class CompanyPublicService : ICompanyPublicService
         var role = await CreateOwnerRole(newCompany, cancellationToken);
         user.Role = role;
         user.Company = newCompany;
-
+        
         await AccounteeContext.SaveChangesAsync(cancellationToken);
+        GlobalHttpContext.SetCompanyId(newCompany.Id);
+        
         var mapped = Mapper.Map<CompanyDto>(newCompany);
 
+        GlobalHttpContext.SetIgnoreCompanyFilter(false);
         return mapped;
     }
 
@@ -106,6 +112,28 @@ public class CompanyPublicService : ICompanyPublicService
         user.Company.PhoneNumber = model.PhoneNumber ?? user.Company.PhoneNumber;
         user.Company.Name = model.Name ?? user.Company.Name;
 
+        await AccounteeContext.SaveChangesAsync(cancellationToken);
+        var mapped = Mapper.Map<CompanyDto>(user.Company);
+        
+        return mapped;
+    }
+
+    public async Task<CompanyDto> EditBudget(decimal value, CancellationToken cancellationToken)
+    {
+        var userId = CurrentUserPrivateService.GetCurrentUserId();
+        var user = await AccounteeContext.Users
+            .Include(x => x.Role)
+            .Include(x => x.Company)
+            .Where(x => x.Id == userId)
+            .FirstOrNotFound(cancellationToken);
+        
+        CurrentUserPrivateService.CheckUserRights(user, UserRights.CanEditCompany);
+        if (user.Company == null)
+        {
+            throw new AccounteeException();
+        }
+        
+        user.Company.Budget = value;
         await AccounteeContext.SaveChangesAsync(cancellationToken);
         var mapped = Mapper.Map<CompanyDto>(user.Company);
         

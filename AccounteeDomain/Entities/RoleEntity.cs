@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AccounteeDomain.Entities.Base;
 
 namespace AccounteeDomain.Entities;
 
-public class RoleEntity
+public class RoleEntity : IBaseWithCompany
 {
     public int Id { get; set; }
     public int? IdCompany { get; set; }
