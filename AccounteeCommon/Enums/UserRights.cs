@@ -1,4 +1,4 @@
-﻿namespace AccounteeService.Contracts.Enums;
+﻿namespace AccounteeCommon.Enums;
 
 public enum UserRights
 {

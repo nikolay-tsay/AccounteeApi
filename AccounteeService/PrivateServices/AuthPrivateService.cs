@@ -1,9 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AccounteeCommon.Enums;
 using AccounteeCommon.Options;
 using AccounteeDomain.Entities;
-using AccounteeService.Contracts.Enums;
 using AccounteeService.PrivateServices.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 

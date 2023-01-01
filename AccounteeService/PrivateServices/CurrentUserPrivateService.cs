@@ -1,7 +1,7 @@
-﻿using AccounteeCommon.Exceptions;
+﻿using AccounteeCommon.Enums;
+using AccounteeCommon.Exceptions;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
-using AccounteeService.Contracts.Enums;
 using AccounteeService.Extensions;
 using AccounteeService.PrivateServices.Interfaces;
 using Microsoft.AspNetCore.Http;
