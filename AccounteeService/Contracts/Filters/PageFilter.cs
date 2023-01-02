@@ -1,4 +1,4 @@
-﻿namespace AccounteeService.Contracts;
+﻿namespace AccounteeService.Contracts.Filters;
 
 public class PageFilter
 {

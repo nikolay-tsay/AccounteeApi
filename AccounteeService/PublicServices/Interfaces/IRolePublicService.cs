@@ -1,5 +1,6 @@
 ﻿using AccounteeDomain.Models;
 using AccounteeService.Contracts;
+using AccounteeService.Contracts.Filters;
 
 namespace AccounteeService.PublicServices.Interfaces;
 

@@ -4,6 +4,8 @@ using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
 using AccounteeService.Contracts;
+using AccounteeService.Contracts.Filters;
+using AccounteeService.Contracts.Requests;
 using AccounteeService.Extensions;
 using AccounteeService.PrivateServices.Interfaces;
 using AccounteeService.PublicServices.Interfaces;

@@ -1,5 +1,6 @@
 ﻿using AccounteeCommon.Exceptions;
 using AccounteeService.Contracts;
+using AccounteeService.Contracts.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccounteeService.Extensions;

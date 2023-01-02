@@ -143,5 +143,6 @@ public static class StartupExtension
         builder.Services.AddScoped<ICompanyPublicService, CompanyPublicService>();
         builder.Services.AddScoped<IUserPublicService, UserPublicService>();
         builder.Services.AddScoped<IRolePublicService, RolePublicService>();
+        builder.Services.AddScoped<IIncomePublicService, IncomePublicService>();
     }
 }
