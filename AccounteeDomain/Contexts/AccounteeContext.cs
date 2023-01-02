@@ -12,6 +12,19 @@ public class AccounteeContext : DbContext
     public DbSet<UserEntity> Users { get; set; } = null!;
     public DbSet<CompanyEntity> Companies { get; set; } = null!;
     public DbSet<RoleEntity> Roles { get; set; } = null!;
+    public DbSet<IncomeEntity> Incomes { get; set; } = null!;
+    public DbSet<OutcomeEntity> Outcomes { get; set; } = null!;
+    public DbSet<ServiceEntity> Services { get; set; } = null!;
+    public DbSet<ProductEntity> Products { get; set; } = null!;
+    public DbSet<ServiceProductEntity> ServiceProducts { get; set; } = null!;
+    public DbSet<UserIncomeEntity> UserIncomes { get; set; } = null!;
+    public DbSet<UserServiceEntity> UserServices { get; set; } = null!;
+    public DbSet<IncomeProductEntity> IncomeProducts { get; set; } = null!;
+    public DbSet<OutcomeProductEntity> OutcomeProducts { get; set; } = null!;
+    public DbSet<IncomeCategoryEntity> IncomeCategories { get; set; } = null!;
+    public DbSet<OutcomeCategoryEntity> OutcomeCategories { get; set; } = null!;
+    public DbSet<ProductCategoryEntity> ProductCategories { get; set; } = null!;
+    public DbSet<ServiceCategoryEntity> ServiceCategories { get; set; } = null!;
     
     public AccounteeContext(DbContextOptions<AccounteeContext> options) : base(options) { }
 
@@ -35,6 +48,7 @@ public class AccounteeContext : DbContext
         modelBuilder.Entity<IncomeCategoryEntity>().CompanyFilter();
         modelBuilder.Entity<OutcomeCategoryEntity>().CompanyFilter();
         modelBuilder.Entity<ProductCategoryEntity>().CompanyFilter();
+        modelBuilder.Entity<ServiceCategoryEntity>().CompanyFilter();
 
         modelBuilder.Entity<IncomeEntity>().Property(x => x.DateTime).UtcDate();
         modelBuilder.Entity<IncomeEntity>().Property(x => x.LastEdited).UtcDate();
@@ -94,6 +108,12 @@ public class AccounteeContext : DbContext
         
         modelBuilder.Entity<CompanyEntity>()
             .HasMany<ProductCategoryEntity>(x => x.ProductCategoryList)
+            .WithOne(x => x.Company)
+            .HasForeignKey(x => x.IdCompany)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<CompanyEntity>()
+            .HasMany<ServiceCategoryEntity>(x => x.ServiceCategoryList)
             .WithOne(x => x.Company)
             .HasForeignKey(x => x.IdCompany)
             .OnDelete(DeleteBehavior.Cascade);
