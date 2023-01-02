@@ -217,6 +217,12 @@ public class AccounteeContext : DbContext
             .WithOne(x => x.Service)
             .HasForeignKey(x => x.IdService)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<ServiceCategoryEntity>()
+            .HasMany<ServiceEntity>(x => x.ServiceList)
+            .WithOne(x => x.ServiceCategory)
+            .HasForeignKey(x => x.IdCategory)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<ServiceEntity>()
             .HasIndex(x => new { x.IdCompany, x.Name })

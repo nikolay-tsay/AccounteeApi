@@ -1,4 +1,4 @@
-﻿namespace AccounteeService.Contracts;
+﻿namespace AccounteeService.Contracts.Requests;
 
 public class RegistrationRequest
 {

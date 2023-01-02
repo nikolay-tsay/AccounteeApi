@@ -1,6 +1,8 @@
 ﻿using AccounteeApi.Controllers.Base;
 using AccounteeDomain.Models;
 using AccounteeService.Contracts;
+using AccounteeService.Contracts.Filters;
+using AccounteeService.Contracts.Requests;
 using AccounteeService.PublicServices.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
