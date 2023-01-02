@@ -30,6 +30,7 @@ public class CompanyEntity
     public IEnumerable<IncomeCategoryEntity>? IncomeCategoryList { get; set; }
     public IEnumerable<OutcomeCategoryEntity>? OutcomeCategoryList { get; set; }
     public IEnumerable<ProductCategoryEntity>? ProductCategoryList { get; set; }
+    public IEnumerable<ServiceCategoryEntity>? ServiceCategoryList { get; set; }
     
     public IEnumerable<IncomeProductEntity>? IncomeProductList { get; set; }
     public IEnumerable<OutcomeProductEntity>? OutcomeProductList { get; set; }
