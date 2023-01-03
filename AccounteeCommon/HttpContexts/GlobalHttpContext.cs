@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace AccounteeCommon.HttpContexts;
 
-public static  class GlobalHttpContext
+public static class GlobalHttpContext
 {
     public static IHttpContextAccessor HttpContextAccessor { get; set; } = null!;
 

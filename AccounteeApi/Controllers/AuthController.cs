@@ -1,5 +1,4 @@
 ﻿using AccounteeDomain.Models;
-using AccounteeService.Contracts;
 using AccounteeService.Contracts.Requests;
 using AccounteeService.PublicServices.Interfaces;
 using Microsoft.AspNetCore.Authorization;

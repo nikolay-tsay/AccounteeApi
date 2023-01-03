@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AccounteeApi.Middleware;
+using AccounteeCommon.HttpContexts;
 using AccounteeCommon.Options;
 using AccounteeDomain.Contexts;
 using AccounteeService.Mapping;
@@ -133,7 +134,9 @@ public static class StartupExtension
 
     private static void AddServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpContextAccessor();
+        var accessor = new HttpContextAccessor();
+        builder.Services.AddSingleton<IHttpContextAccessor>(accessor);
+        GlobalHttpContext.HttpContextAccessor = accessor;
         
         builder.Services.AddScoped<IAuthPrivateService, AuthPrivateService>();
         builder.Services.AddScoped<IPasswordHandler, PasswordHandler>();
@@ -144,5 +147,6 @@ public static class StartupExtension
         builder.Services.AddScoped<IUserPublicService, UserPublicService>();
         builder.Services.AddScoped<IRolePublicService, RolePublicService>();
         builder.Services.AddScoped<IIncomePublicService, IncomePublicService>();
+        builder.Services.AddScoped<ICategoryPublicService, CategoryPublicService>();
     }
 }
