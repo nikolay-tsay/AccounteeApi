@@ -35,7 +35,7 @@ public class ProductController : BaseController
 
     [HttpPost("Product")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateProduct(ProductDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateProduct([FromBody] ProductDto model, CancellationToken cancellationToken)
     {
         var result = await ProductPublicService.CreateProduct(model, cancellationToken);
 
@@ -44,7 +44,7 @@ public class ProductController : BaseController
 
     [HttpPut("Product/{productId}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> EditProduct(int productId, ProductDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> EditProduct(int productId, [FromBody] ProductDto model, CancellationToken cancellationToken)
     {
         var result = await ProductPublicService.EditProduct(productId, model, cancellationToken);
 
@@ -52,7 +52,7 @@ public class ProductController : BaseController
         
     }
 
-    [HttpPut("Product/{productId}/{categoryId}")]
+    [HttpPut("Product/{productId}/Category/{categoryId}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> ChangeProductCategory(int productId, int categoryId,
         CancellationToken cancellationToken)

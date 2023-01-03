@@ -2,18 +2,13 @@
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Models;
 using AccounteeService.Contracts.Filters;
-using AccounteeService.PrivateServices;
 using AccounteeService.PrivateServices.Interfaces;
 using AccounteeCommon.Exceptions;
 using AccounteeCommon.HttpContexts;
-using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Entities.Enums;
-using AccounteeDomain.Models;
 using AccounteeService.Contracts;
-using AccounteeService.Contracts.Filters;
 using AccounteeService.Extensions;
-using AccounteeService.PrivateServices.Interfaces;
 using AccounteeService.PublicServices.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +42,8 @@ public class ProductPublicService : IProductPublicService
 
     public async Task<ProductDto> GetProductById(int productId, CancellationToken cancellationToken)
     {
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadProducts, cancellationToken);
+        
         var product = await AccounteeContext.Products
             .AsNoTracking()
             .Include(x => x.ProductCategory)
@@ -60,8 +57,7 @@ public class ProductPublicService : IProductPublicService
 
     public async Task<ProductDto> CreateProduct(ProductDto model, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanCreateProducts);
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanCreateProducts, cancellationToken);
         
         if (string.IsNullOrWhiteSpace(model.Name))
         {
@@ -87,6 +83,8 @@ public class ProductPublicService : IProductPublicService
 
     public async Task<ProductDto> EditProduct(int productId, ProductDto model, CancellationToken cancellationToken)
     {
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanEditProducts, cancellationToken);
+        
         var product = await AccounteeContext.Products
             .Where(x => x.Id == productId)
             .FirstOrNotFound(cancellationToken);
@@ -107,6 +105,8 @@ public class ProductPublicService : IProductPublicService
     public async Task<ProductDto> ChangeProductCategory(int productId, int categoryId,
         CancellationToken cancellationToken)
     {
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanEditProducts, cancellationToken);
+        
         var product = await AccounteeContext.Products
             .Include(x => x.ProductCategory)
             .Where(x => x.Id == productId)
@@ -128,6 +128,8 @@ public class ProductPublicService : IProductPublicService
 
     public async Task<bool> DeleteProduct(int productId, CancellationToken cancellationToken)
     {
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanDeleteProducts, cancellationToken);
+        
         var product = await AccounteeContext.Products
             .Where(x => x.Id == productId)
             .FirstOrNotFound(cancellationToken);
