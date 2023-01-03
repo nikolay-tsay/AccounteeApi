@@ -1,4 +1,5 @@
-﻿using AccounteeCommon.Exceptions;
+﻿using System.Linq.Expressions;
+using AccounteeCommon.Exceptions;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,18 @@ namespace AccounteeService.Extensions;
 
 public static class QueryExtension
 {
+    public static IQueryable<T> IncludeIf<T, TProperty>(this IQueryable<T> source, bool condition, Expression<Func<T, TProperty>> path) where T : class
+    {
+        if (condition)
+        {
+            return source.Include(path);
+        }
+        else
+        {
+            return source;
+        }
+    }
+
     public static async Task<T> FirstOrNotFound<T>(this IQueryable<T> query, CancellationToken cancellationToken)
     {
         var result = await query.FirstOrDefaultAsync(cancellationToken);
@@ -19,20 +32,6 @@ public static class QueryExtension
         return result;
     }
 
-    public static async Task<IEnumerable<T>> GetPage<T>(this IQueryable<T> query, PageFilter filter, CancellationToken cancellationToken)
-    {
-        if (filter.PageNum > 1)
-        {
-            query = query.Skip(filter.PageNum * filter.PageSize);
-        }
-
-        var list = await query
-            .Take(filter.PageSize)
-            .ToListAsync(cancellationToken);
-
-        return list;
-    }
-    
     public static async Task<PagedList<T>> ToPagedList<T>(this IQueryable<T> source, PageFilter filter, CancellationToken cancellationToken)
     {
         var paged = new PagedList<T>

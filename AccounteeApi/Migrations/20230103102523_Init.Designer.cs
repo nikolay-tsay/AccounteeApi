@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccounteeApi.Migrations
 {
     [DbContext(typeof(AccounteeContext))]
-    [Migration("20230103094859_Init")]
+    [Migration("20230103102523_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -57,7 +57,10 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("IncomeCategories");
+                    b.HasIndex("IdCompany", "Name", "Target")
+                        .IsUnique();
+
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.CompanyEntity", b =>
@@ -633,7 +636,7 @@ namespace AccounteeApi.Migrations
                     b.HasOne("AccounteeDomain.Entities.CategoryEntity", "IncomeCategory")
                         .WithMany("IncomeList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
@@ -658,7 +661,7 @@ namespace AccounteeApi.Migrations
                     b.HasOne("AccounteeDomain.Entities.CategoryEntity", "OutcomeCategory")
                         .WithMany("OutcomeList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
@@ -676,7 +679,7 @@ namespace AccounteeApi.Migrations
                     b.HasOne("AccounteeDomain.Entities.CategoryEntity", "ProductCategory")
                         .WithMany("ProductList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
@@ -834,7 +837,7 @@ namespace AccounteeApi.Migrations
                     b.HasOne("AccounteeDomain.Entities.CategoryEntity", "ServiceCategory")
                         .WithMany("ServiceList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
