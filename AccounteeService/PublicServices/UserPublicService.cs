@@ -80,7 +80,8 @@ public class UserPublicService : IUserPublicService
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            PhoneNumber = request.PhoneNumber
+            PhoneNumber = request.PhoneNumber,
+            IncomePercent = request.IncomePercent
         };
 
         AccounteeContext.Add(newUser);
@@ -103,6 +104,7 @@ public class UserPublicService : IUserPublicService
         user.LastName = model.LastName ?? user.LastName;
         user.Email = model.Email ?? user.Email;
         user.PhoneNumber = model.PhoneNumber ?? user.PhoneNumber;
+        user.IncomePercent = model.IncomePercent ?? user.IncomePercent;
 
         await AccounteeContext.SaveChangesAsync(cancellationToken);
         var mapped = Mapper.Map<UserDto>(user);
