@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AccounteeDomain.Entities.Base;
-using AccounteeDomain.Entities.Categories;
 using AccounteeDomain.Entities.Enums;
 using AccounteeDomain.Entities.Relational;
 
@@ -22,7 +21,7 @@ public class ProductEntity : IBaseWithCompany
     public decimal Amount { get; set; }
     public decimal TotalPrice { get; set; }
 
-    public ProductCategoryEntity ProductCategory { get; set; } = null!;
+    public CategoryEntity ProductCategory { get; set; } = null!;
     public CompanyEntity? Company { get; set; }
 
     public IEnumerable<IncomeProductEntity>? IncomeProductList { get; set; }

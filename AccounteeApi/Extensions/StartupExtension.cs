@@ -67,8 +67,8 @@ public static class StartupExtension
                 }
             });
         });
-        builder.Services.AddAutoMapper(typeof(MapperProfile));
-        
+        builder.Services.AddAutoMapper(typeof(EntityToModelProfile), typeof(ModelToEntityProfile));
+
         var jwtOptions = new JwtOptions();
         var pwdOptions = new PwdOptions();
         

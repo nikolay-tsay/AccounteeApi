@@ -7,9 +7,9 @@ using AutoMapper;
 
 namespace AccounteeService.Mapping;
 
-public class MapperProfile : Profile
+public class EntityToModelProfile : Profile
 {
-    public MapperProfile()
+    public EntityToModelProfile()
     {
         CreateMap<CompanyEntity, CompanyDto>();
         

@@ -20,16 +20,20 @@ namespace AccounteeApi.Migrations
                 .HasAnnotation("ProductVersion", "7.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "category_targets", new[] { "product", "income", "outcome", "service" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "measurement_units", new[] { "piece", "milliliter", "litre", "kilogram", "milligram", "gram" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.IncomeCategoryEntity", b =>
+            modelBuilder.Entity("AccounteeDomain.Entities.CategoryEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasMaxLength(250)
@@ -43,65 +47,14 @@ namespace AccounteeApi.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdCompany");
-
-                    b.ToTable("IncomeCategoryEntity");
-                });
-
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.OutcomeCategoryEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("Target")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
-
-                    b.Property<int?>("IdCompany")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdCompany");
+                    b.HasIndex("CompanyId");
 
-                    b.ToTable("OutcomeCategoryEntity");
-                });
-
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.ProductCategoryEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
-
-                    b.Property<int?>("IdCompany")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdCompany");
-
-                    b.ToTable("ProductCategoryEntity");
+                    b.ToTable("IncomeCategories");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.CompanyEntity", b =>
@@ -176,7 +129,7 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("IdService");
 
-                    b.ToTable("IncomeEntity");
+                    b.ToTable("Incomes");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.OutcomeEntity", b =>
@@ -215,7 +168,7 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("IdCompany");
 
-                    b.ToTable("OutcomeEntity");
+                    b.ToTable("Outcomes");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.ProductEntity", b =>
@@ -257,7 +210,7 @@ namespace AccounteeApi.Migrations
                     b.HasIndex("IdCompany", "Name")
                         .IsUnique();
 
-                    b.ToTable("ProductEntity");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.Relational.IncomeProductEntity", b =>
@@ -288,7 +241,7 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("IdProduct");
 
-                    b.ToTable("IncomeProductEntity");
+                    b.ToTable("IncomeProducts");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.Relational.OutcomeProductEntity", b =>
@@ -319,7 +272,7 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("IdProduct");
 
-                    b.ToTable("OutcomeProductEntity");
+                    b.ToTable("OutcomeProducts");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.Relational.ServiceProductEntity", b =>
@@ -353,7 +306,7 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("IdService");
 
-                    b.ToTable("ServiceProductEntity");
+                    b.ToTable("ServiceProducts");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.Relational.UserIncomeEntity", b =>
@@ -384,7 +337,7 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("IdUser");
 
-                    b.ToTable("UserIncomeEntity");
+                    b.ToTable("UserIncomes");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.Relational.UserServiceEntity", b =>
@@ -412,7 +365,7 @@ namespace AccounteeApi.Migrations
 
                     b.HasIndex("IdUser");
 
-                    b.ToTable("UserServiceEntity");
+                    b.ToTable("UserServices");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.RoleEntity", b =>
@@ -423,13 +376,25 @@ namespace AccounteeApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("CanCreateCategories")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanCreateCompany")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanCreateOutlay")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanCreateProducts")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanCreateRoles")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanCreateServices")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanDeleteCategories")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanDeleteCompany")
@@ -438,10 +403,19 @@ namespace AccounteeApi.Migrations
                     b.Property<bool>("CanDeleteOutlay")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanDeleteProducts")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanDeleteRoles")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanDeleteServices")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanDeleteUsers")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEditCategories")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanEditCompany")
@@ -450,16 +424,31 @@ namespace AccounteeApi.Migrations
                     b.Property<bool>("CanEditOutlay")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanEditProducts")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanEditRoles")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEditServices")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanEditUsers")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanReadCategories")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanReadOutlay")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanReadProducts")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanReadRoles")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanReadServices")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanReadUsers")
@@ -497,19 +486,31 @@ namespace AccounteeApi.Migrations
                         new
                         {
                             Id = 1,
+                            CanCreateCategories = false,
                             CanCreateCompany = true,
                             CanCreateOutlay = false,
+                            CanCreateProducts = false,
                             CanCreateRoles = false,
+                            CanCreateServices = false,
+                            CanDeleteCategories = false,
                             CanDeleteCompany = false,
                             CanDeleteOutlay = false,
+                            CanDeleteProducts = false,
                             CanDeleteRoles = false,
+                            CanDeleteServices = false,
                             CanDeleteUsers = false,
+                            CanEditCategories = false,
                             CanEditCompany = false,
                             CanEditOutlay = false,
+                            CanEditProducts = false,
                             CanEditRoles = false,
+                            CanEditServices = false,
                             CanEditUsers = false,
+                            CanReadCategories = false,
                             CanReadOutlay = false,
+                            CanReadProducts = false,
                             CanReadRoles = false,
+                            CanReadServices = false,
                             CanReadUsers = false,
                             CanRegisterUsers = false,
                             CanUploadFiles = false,
@@ -530,6 +531,9 @@ namespace AccounteeApi.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
+                    b.Property<int>("IdCategory")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("IdCompany")
                         .HasColumnType("integer");
 
@@ -543,10 +547,12 @@ namespace AccounteeApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IdCategory");
+
                     b.HasIndex("IdCompany", "Name")
                         .IsUnique();
 
-                    b.ToTable("ServiceEntity");
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.UserEntity", b =>
@@ -610,42 +616,21 @@ namespace AccounteeApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.IncomeCategoryEntity", b =>
+            modelBuilder.Entity("AccounteeDomain.Entities.CategoryEntity", b =>
                 {
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
-                        .WithMany("IncomeCategoryList")
-                        .HasForeignKey("IdCompany")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.OutcomeCategoryEntity", b =>
-                {
-                    b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
-                        .WithMany("OutcomeCategoryList")
-                        .HasForeignKey("IdCompany")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.ProductCategoryEntity", b =>
-                {
-                    b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
-                        .WithMany("ProductCategoryList")
-                        .HasForeignKey("IdCompany")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany("CategoryList")
+                        .HasForeignKey("CompanyId");
 
                     b.Navigation("Company");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.IncomeEntity", b =>
                 {
-                    b.HasOne("AccounteeDomain.Entities.Categories.IncomeCategoryEntity", "IncomeCategory")
+                    b.HasOne("AccounteeDomain.Entities.CategoryEntity", "IncomeCategory")
                         .WithMany("IncomeList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
@@ -667,10 +652,10 @@ namespace AccounteeApi.Migrations
 
             modelBuilder.Entity("AccounteeDomain.Entities.OutcomeEntity", b =>
                 {
-                    b.HasOne("AccounteeDomain.Entities.Categories.OutcomeCategoryEntity", "OutcomeCategory")
+                    b.HasOne("AccounteeDomain.Entities.CategoryEntity", "OutcomeCategory")
                         .WithMany("OutcomeList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
@@ -685,10 +670,10 @@ namespace AccounteeApi.Migrations
 
             modelBuilder.Entity("AccounteeDomain.Entities.ProductEntity", b =>
                 {
-                    b.HasOne("AccounteeDomain.Entities.Categories.ProductCategoryEntity", "ProductCategory")
+                    b.HasOne("AccounteeDomain.Entities.CategoryEntity", "ProductCategory")
                         .WithMany("ProductList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
@@ -843,12 +828,20 @@ namespace AccounteeApi.Migrations
 
             modelBuilder.Entity("AccounteeDomain.Entities.ServiceEntity", b =>
                 {
+                    b.HasOne("AccounteeDomain.Entities.CategoryEntity", "ServiceCategory")
+                        .WithMany("ServiceList")
+                        .HasForeignKey("IdCategory")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
                         .WithMany("ServiceList")
                         .HasForeignKey("IdCompany")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Company");
+
+                    b.Navigation("ServiceCategory");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.UserEntity", b =>
@@ -869,36 +862,28 @@ namespace AccounteeApi.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.IncomeCategoryEntity", b =>
+            modelBuilder.Entity("AccounteeDomain.Entities.CategoryEntity", b =>
                 {
                     b.Navigation("IncomeList");
-                });
 
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.OutcomeCategoryEntity", b =>
-                {
                     b.Navigation("OutcomeList");
-                });
 
-            modelBuilder.Entity("AccounteeDomain.Entities.Categories.ProductCategoryEntity", b =>
-                {
                     b.Navigation("ProductList");
+
+                    b.Navigation("ServiceList");
                 });
 
             modelBuilder.Entity("AccounteeDomain.Entities.CompanyEntity", b =>
                 {
-                    b.Navigation("IncomeCategoryList");
+                    b.Navigation("CategoryList");
 
                     b.Navigation("IncomeList");
 
                     b.Navigation("IncomeProductList");
 
-                    b.Navigation("OutcomeCategoryList");
-
                     b.Navigation("OutcomeList");
 
                     b.Navigation("OutcomeProductList");
-
-                    b.Navigation("ProductCategoryList");
 
                     b.Navigation("ProductList");
 

@@ -62,25 +62,11 @@ public class RolePublicService : IRolePublicService
             throw new AccounteeException();
         }
 
-        var newRole = new RoleEntity
+        var newRole = Mapper.Map<RoleEntity>(model);
+        if (newRole == null)
         {
-            IdCompany = currentUser.IdCompany,
-            Name = model.Name,
-            Description = model.Description,
-            CanEditCompany = model.CanEditCompany ?? false,
-            CanReadUsers = model.CanReadUsers ?? false,
-            CanRegisterUsers = model.CanRegisterUsers ?? false,
-            CanEditUsers = model.CanEditUsers ?? false,
-            CanDeleteUsers = model.CanDeleteUsers ?? false,
-            CanReadRoles = model.CanReadRoles ?? false,
-            CanCreateRoles = model.CanCreateRoles ?? false,
-            CanEditRoles = model.CanEditRoles ?? false,
-            CanDeleteRoles = model.CanDeleteRoles ?? false,
-            CanReadOutlay = model.CanReadOutlay ?? false,
-            CanEditOutlay = model.CanEditOutlay ?? false,
-            CanCreateOutlay = model.CanCreateOutlay ?? false,
-            CanDeleteOutlay = model.CanDeleteOutlay ?? false
-        };
+            throw new AccounteeException();
+        }
 
         AccounteeContext.Roles.Add(newRole);
         await AccounteeContext.SaveChangesAsync(cancellationToken);
@@ -113,7 +99,20 @@ public class RolePublicService : IRolePublicService
         role.CanCreateOutlay = model.CanCreateOutlay ?? role.CanCreateOutlay;
         role.CanEditOutlay = model.CanEditOutlay ?? role.CanEditOutlay;
         role.CanDeleteOutlay = model.CanDeleteOutlay ?? role.CanDeleteOutlay;
-
+        role.CanReadProducts = model.CanReadProducts ?? role.CanReadProducts;
+        role.CanCreateProducts = model.CanCreateProducts ?? role.CanCreateProducts;
+        role.CanEditProducts = model.CanEditProducts ?? role.CanEditProducts;
+        role.CanDeleteProducts = model.CanDeleteProducts ?? role.CanDeleteProducts;
+        role.CanReadServices = model.CanReadServices ?? role.CanReadServices;
+        role.CanCreateServices = model.CanCreateServices ?? role.CanCreateServices;
+        role.CanEditServices = model.CanEditServices ?? role.CanEditServices;
+        role.CanDeleteServices = model.CanDeleteServices ?? role.CanDeleteServices;
+        role.CanReadCategories = model.CanReadCategories ?? role.CanReadCategories;
+        role.CanCreateCategories = model.CanCreateCategories ?? role.CanCreateCategories;
+        role.CanEditCategories = model.CanEditCategories ?? role.CanEditCategories;
+        role.CanDeleteCategories = model.CanDeleteCategories ?? role.CanDeleteCategories;
+        role.CanUploadFiles = model.CanUploadFiles ?? role.CanUploadFiles;
+        
         await AccounteeContext.SaveChangesAsync(cancellationToken);
 
         var mapped = Mapper.Map<RoleDto>(role);

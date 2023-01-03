@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AccounteeDomain.Entities.Base;
-using AccounteeDomain.Entities.Categories;
 using AccounteeDomain.Entities.Relational;
 
 namespace AccounteeDomain.Entities;
@@ -23,7 +22,7 @@ public class IncomeEntity : IBaseWithCompany
     
     public CompanyEntity? Company { get; set; }
     public ServiceEntity? Service { get; set; }
-    public IncomeCategoryEntity IncomeCategory { get; set; } = null!;
+    public CategoryEntity IncomeCategory { get; set; } = null!;
     
     public IEnumerable<UserIncomeEntity>? UserIncomeList { get; set; }
     public IEnumerable<IncomeProductEntity>? IncomeProductList { get; set; }
