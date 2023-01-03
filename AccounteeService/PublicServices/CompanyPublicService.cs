@@ -53,7 +53,8 @@ public class CompanyPublicService : ICompanyPublicService
         {
             Name = model.Name!,
             Email = model.Email,
-            PhoneNumber = model.PhoneNumber
+            PhoneNumber = model.PhoneNumber,
+            Budget = model.Budget ?? 0
         };
 
         await AccounteeContext.Companies.AddAsync(newCompany, cancellationToken);
@@ -62,8 +63,7 @@ public class CompanyPublicService : ICompanyPublicService
         user.Company = newCompany;
         
         await AccounteeContext.SaveChangesAsync(cancellationToken);
-        GlobalHttpContext.SetCompanyId(newCompany.Id);
-        
+
         var mapped = Mapper.Map<CompanyDto>(newCompany);
 
         GlobalHttpContext.SetIgnoreCompanyFilter(false);

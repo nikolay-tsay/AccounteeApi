@@ -45,11 +45,6 @@ public class AuthPublicService : IAuthPublicService
             throw new AccounteeUnauthorizedException();
         }
 
-        if (user.IdCompany != null)
-        {
-            GlobalHttpContext.SetCompanyId(user.IdCompany.Value);
-        }
-        
         var token = AuthPrivateService.GetJwtToken(user, cancellationToken);
         
         GlobalHttpContext.SetIgnoreCompanyFilter(false);

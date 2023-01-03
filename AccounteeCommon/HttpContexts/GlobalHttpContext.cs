@@ -1,4 +1,5 @@
 ﻿using AccounteeCommon.Enums;
+using AccounteeCommon.Exceptions;
 using Microsoft.AspNetCore.Http;
 
 namespace AccounteeCommon.HttpContexts;
@@ -26,18 +27,12 @@ public static class GlobalHttpContext
     
     public static int GetCompanyId()
     {
-        var items = HttpContextAccessor.HttpContext.Items;
-        if (items.TryGetValue(ClaimNames.CompanyId, out var value) && value != null)
+        var claimStr = HttpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimNames.CompanyId)?.Value;
+        if(!int.TryParse(claimStr, out var companyId))
         {
-            return (int)value;
+            throw new AccounteeUnauthorizedException();
         }
 
-        return -1;
-    }
-
-    public static void SetCompanyId(int id)
-    {
-        var items = HttpContextAccessor.HttpContext.Items;
-        items[ClaimNames.CompanyId] = id;
+        return companyId;
     }
 }
