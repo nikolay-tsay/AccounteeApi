@@ -41,17 +41,17 @@ namespace AccounteeApi.Migrations
                     IdCompany = table.Column<int>(type: "integer", nullable: true),
                     Target = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
-                    CompanyId = table.Column<int>(type: "integer", nullable: true)
+                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Categories_Companies_CompanyId",
-                        column: x => x.CompanyId,
+                        name: "FK_Categories_Companies_IdCompany",
+                        column: x => x.IdCompany,
                         principalTable: "Companies",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -441,11 +441,6 @@ namespace AccounteeApi.Migrations
                 table: "Roles",
                 columns: new[] { "Id", "CanCreateCategories", "CanCreateCompany", "CanCreateOutlay", "CanCreateProducts", "CanCreateRoles", "CanCreateServices", "CanDeleteCategories", "CanDeleteCompany", "CanDeleteOutlay", "CanDeleteProducts", "CanDeleteRoles", "CanDeleteServices", "CanDeleteUsers", "CanEditCategories", "CanEditCompany", "CanEditOutlay", "CanEditProducts", "CanEditRoles", "CanEditServices", "CanEditUsers", "CanReadCategories", "CanReadOutlay", "CanReadProducts", "CanReadRoles", "CanReadServices", "CanReadUsers", "CanRegisterUsers", "CanUploadFiles", "Description", "IdCompany", "IsAdmin", "Name" },
                 values: new object[] { 1, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, null, null, false, "Visitor" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Categories_CompanyId",
-                table: "Categories",
-                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_IdCompany_Name_Target",

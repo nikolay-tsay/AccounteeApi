@@ -69,6 +69,12 @@ public class AccounteeContext : DbContext
             .WithOne(x => x.Company)
             .HasForeignKey(x => x.IdCompany)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<CompanyEntity>()
+            .HasMany<CategoryEntity>(x => x.CategoryList)
+            .WithOne(x => x.Company)
+            .HasForeignKey(x => x.IdCompany)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CompanyEntity>()
             .HasMany<OutcomeEntity>(x => x.OutcomeList)

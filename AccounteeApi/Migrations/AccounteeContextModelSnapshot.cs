@@ -32,9 +32,6 @@ namespace AccounteeApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Description")
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
@@ -51,8 +48,6 @@ namespace AccounteeApi.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
 
                     b.HasIndex("IdCompany", "Name", "Target")
                         .IsUnique();
@@ -623,7 +618,8 @@ namespace AccounteeApi.Migrations
                 {
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
                         .WithMany("CategoryList")
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("IdCompany")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Company");
                 });
