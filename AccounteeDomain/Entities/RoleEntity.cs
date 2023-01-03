@@ -29,7 +29,7 @@ public class RoleEntity : IBaseWithCompany
     public bool CanCreateRoles { get; set; }
     public bool CanEditRoles { get; set; }
     public bool CanDeleteRoles { get; set; }
-    
+
     public bool CanReadOutlay { get; set; }
     public bool CanCreateOutlay { get; set; }
     public bool CanEditOutlay { get; set; }

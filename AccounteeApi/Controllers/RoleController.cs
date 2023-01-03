@@ -53,7 +53,7 @@ public class RoleController : BaseController
     }
     
     [HttpDelete("Role/{roleId}")]
-    [ProducesResponseType(typeof(RoleDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteRole(int roleId, CancellationToken cancellationToken)
     {
         var result = await RolePublicService.DeleteRole(roleId, cancellationToken);

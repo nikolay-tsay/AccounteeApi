@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using AccounteeApi.Controllers;
 using AccounteeApi.Middleware;
 using AccounteeCommon.HttpContexts;
 using AccounteeCommon.Options;
@@ -145,6 +146,7 @@ public static class StartupExtension
         builder.Services.AddScoped<IAuthPublicService, AuthPublicService>();
         builder.Services.AddScoped<ICompanyPublicService, CompanyPublicService>();
         builder.Services.AddScoped<IUserPublicService, UserPublicService>();
+        builder.Services.AddScoped<IProductPublicService, ProductPublicService>();
         builder.Services.AddScoped<IRolePublicService, RolePublicService>();
         builder.Services.AddScoped<IIncomePublicService, IncomePublicService>();
         builder.Services.AddScoped<ICategoryPublicService, CategoryPublicService>();

@@ -10,7 +10,7 @@ public class ProductEntity : IBaseWithCompany
     [Key]
     public int Id { get; set; }
 
-    public int IdCategory { get; set; }
+    public int? IdCategory { get; set; }
     public int? IdCompany { get; set; }
 
     [MaxLength(50)]
