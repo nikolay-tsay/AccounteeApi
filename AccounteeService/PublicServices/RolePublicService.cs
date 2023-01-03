@@ -1,5 +1,6 @@
 ﻿using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
+using AccounteeCommon.HttpContexts;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
@@ -67,6 +68,8 @@ public class RolePublicService : IRolePublicService
         {
             throw new AccounteeException();
         }
+
+        newRole.IdCompany = GlobalHttpContext.GetCompanyId();
 
         AccounteeContext.Roles.Add(newRole);
         await AccounteeContext.SaveChangesAsync(cancellationToken);

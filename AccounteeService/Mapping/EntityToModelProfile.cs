@@ -82,5 +82,12 @@ public class EntityToModelProfile : Profile
                 => opt.MapFrom(x => x.UserIncomeList))
             .ForMember(x => x.ProductList, opt
                 => opt.MapFrom(x => x.IncomeProductList));
+        
+        CreateMap<CategoryEntity, CategoryDto>();
+        
+        CreateMap<PagedList<CategoryEntity>, PagedList<CategoryDto>>()
+            .ForMember(d => d.Items, 
+                opt
+                    => opt.MapFrom(s => s.Items));
     }
 }

@@ -20,7 +20,7 @@ public class AccounteeContext : DbContext
     public DbSet<UserServiceEntity> UserServices { get; set; } = null!;
     public DbSet<IncomeProductEntity> IncomeProducts { get; set; } = null!;
     public DbSet<OutcomeProductEntity> OutcomeProducts { get; set; } = null!;
-    public DbSet<CategoryEntity> IncomeCategories { get; set; } = null!;
+    public DbSet<CategoryEntity> Categories { get; set; } = null!;
 
     public AccounteeContext(DbContextOptions<AccounteeContext> options) : base(options) { }
 
@@ -194,25 +194,29 @@ public class AccounteeContext : DbContext
             .HasMany<IncomeEntity>(x => x.IncomeList)
             .WithOne(x => x.IncomeCategory)
             .HasForeignKey(x => x.IdCategory)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.Entity<CategoryEntity>()
             .HasMany<OutcomeEntity>(x => x.OutcomeList)
             .WithOne(x => x.OutcomeCategory)
             .HasForeignKey(x => x.IdCategory)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.Entity<CategoryEntity>()
             .HasMany<ProductEntity>(x => x.ProductList)
             .WithOne(x => x.ProductCategory)
             .HasForeignKey(x => x.IdCategory)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.Entity<CategoryEntity>()
             .HasMany<ServiceEntity>(x => x.ServiceList)
             .WithOne(x => x.ServiceCategory)
             .HasForeignKey(x => x.IdCategory)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<CategoryEntity>()
+            .HasIndex(x => new { x.IdCompany ,x.Name, x.Target})
+            .IsUnique();
 
         modelBuilder.Entity<ServiceEntity>()
             .HasIndex(x => new { x.IdCompany, x.Name })

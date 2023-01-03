@@ -33,7 +33,7 @@ namespace AccounteeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IncomeCategories",
+                name: "Categories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -46,9 +46,9 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IncomeCategories", x => x.Id);
+                    table.PrimaryKey("PK_Categories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IncomeCategories_Companies_CompanyId",
+                        name: "FK_Categories_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id");
@@ -122,15 +122,15 @@ namespace AccounteeApi.Migrations
                 {
                     table.PrimaryKey("PK_Outcomes", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Outcomes_Categories_IdCategory",
+                        column: x => x.IdCategory,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Outcomes_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Outcomes_IncomeCategories_IdCategory",
-                        column: x => x.IdCategory,
-                        principalTable: "IncomeCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -153,15 +153,15 @@ namespace AccounteeApi.Migrations
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Products_Categories_IdCategory",
+                        column: x => x.IdCategory,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Products_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Products_IncomeCategories_IdCategory",
-                        column: x => x.IdCategory,
-                        principalTable: "IncomeCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -182,15 +182,15 @@ namespace AccounteeApi.Migrations
                 {
                     table.PrimaryKey("PK_Services", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Services_Categories_IdCategory",
+                        column: x => x.IdCategory,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Services_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Services_IncomeCategories_IdCategory",
-                        column: x => x.IdCategory,
-                        principalTable: "IncomeCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -282,15 +282,15 @@ namespace AccounteeApi.Migrations
                 {
                     table.PrimaryKey("PK_Incomes", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Incomes_Categories_IdCategory",
+                        column: x => x.IdCategory,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Incomes_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Incomes_IncomeCategories_IdCategory",
-                        column: x => x.IdCategory,
-                        principalTable: "IncomeCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -443,9 +443,15 @@ namespace AccounteeApi.Migrations
                 values: new object[] { 1, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, null, null, false, "Visitor" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeCategories_CompanyId",
-                table: "IncomeCategories",
+                name: "IX_Categories_CompanyId",
+                table: "Categories",
                 column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Categories_IdCompany_Name_Target",
+                table: "Categories",
+                columns: new[] { "IdCompany", "Name", "Target" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_IncomeProducts_IdCompany",
@@ -624,7 +630,7 @@ namespace AccounteeApi.Migrations
                 name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "IncomeCategories");
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Companies");
