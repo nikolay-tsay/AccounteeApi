@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AccounteeDomain.Entities.Categories;
 using AccounteeDomain.Entities.Relational;
 
 namespace AccounteeDomain.Entities;
@@ -26,12 +25,7 @@ public class CompanyEntity
     public IEnumerable<OutcomeEntity>? OutcomeList { get; set; }
     public IEnumerable<ProductEntity>? ProductList { get; set; }
     public IEnumerable<ServiceEntity>? ServiceList { get; set; }
-    
-    public IEnumerable<IncomeCategoryEntity>? IncomeCategoryList { get; set; }
-    public IEnumerable<OutcomeCategoryEntity>? OutcomeCategoryList { get; set; }
-    public IEnumerable<ProductCategoryEntity>? ProductCategoryList { get; set; }
-    public IEnumerable<ServiceCategoryEntity>? ServiceCategoryList { get; set; }
-    
+    public IEnumerable<CategoryEntity>? CategoryList { get; set; }
     public IEnumerable<IncomeProductEntity>? IncomeProductList { get; set; }
     public IEnumerable<OutcomeProductEntity>? OutcomeProductList { get; set; }
     public IEnumerable<ServiceProductEntity>? ServiceProductList { get; set; }

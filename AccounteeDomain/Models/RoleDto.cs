@@ -27,4 +27,22 @@ public class RoleDto
     public bool? CanCreateOutlay { get; set; }
     public bool? CanEditOutlay { get; set; }
     public bool? CanDeleteOutlay { get; set; }
+    
+    public bool? CanReadProducts { get; set; }
+    public bool? CanCreateProducts { get; set; }
+    public bool? CanEditProducts { get; set; }
+    public bool? CanDeleteProducts { get; set; }
+    
+    public bool? CanReadServices { get; set; }
+    public bool? CanCreateServices { get; set; }
+    public bool? CanEditServices { get; set; }
+    public bool? CanDeleteServices { get; set; }
+    
+    public bool? CanReadCategories { get; set; }
+    public bool? CanCreateCategories { get; set; }
+    public bool? CanEditCategories { get; set; }
+    public bool? CanDeleteCategories { get; set; }
+    
+    public bool? CanUploadFiles { get; set; }
+
 }

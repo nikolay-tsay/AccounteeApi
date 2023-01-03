@@ -13,6 +13,7 @@ namespace AccounteeApi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:category_targets", "product,income,outcome,service")
                 .Annotation("Npgsql:Enum:measurement_units", "piece,milliliter,litre,kilogram,milligram,gram");
 
             migrationBuilder.CreateTable(
@@ -32,66 +33,25 @@ namespace AccounteeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IncomeCategoryEntity",
+                name: "IncomeCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdCompany = table.Column<int>(type: "integer", nullable: true),
+                    Target = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true)
+                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
+                    CompanyId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IncomeCategoryEntity", x => x.Id);
+                    table.PrimaryKey("PK_IncomeCategories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IncomeCategoryEntity_Companies_IdCompany",
-                        column: x => x.IdCompany,
+                        name: "FK_IncomeCategories_Companies_CompanyId",
+                        column: x => x.CompanyId,
                         principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OutcomeCategoryEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IdCompany = table.Column<int>(type: "integer", nullable: true),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OutcomeCategoryEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OutcomeCategoryEntity_Companies_IdCompany",
-                        column: x => x.IdCompany,
-                        principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProductCategoryEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IdCompany = table.Column<int>(type: "integer", nullable: true),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductCategoryEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProductCategoryEntity_Companies_IdCompany",
-                        column: x => x.IdCompany,
-                        principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -119,6 +79,18 @@ namespace AccounteeApi.Migrations
                     CanCreateOutlay = table.Column<bool>(type: "boolean", nullable: false),
                     CanEditOutlay = table.Column<bool>(type: "boolean", nullable: false),
                     CanDeleteOutlay = table.Column<bool>(type: "boolean", nullable: false),
+                    CanReadProducts = table.Column<bool>(type: "boolean", nullable: false),
+                    CanCreateProducts = table.Column<bool>(type: "boolean", nullable: false),
+                    CanEditProducts = table.Column<bool>(type: "boolean", nullable: false),
+                    CanDeleteProducts = table.Column<bool>(type: "boolean", nullable: false),
+                    CanReadServices = table.Column<bool>(type: "boolean", nullable: false),
+                    CanCreateServices = table.Column<bool>(type: "boolean", nullable: false),
+                    CanEditServices = table.Column<bool>(type: "boolean", nullable: false),
+                    CanDeleteServices = table.Column<bool>(type: "boolean", nullable: false),
+                    CanReadCategories = table.Column<bool>(type: "boolean", nullable: false),
+                    CanCreateCategories = table.Column<bool>(type: "boolean", nullable: false),
+                    CanEditCategories = table.Column<bool>(type: "boolean", nullable: false),
+                    CanDeleteCategories = table.Column<bool>(type: "boolean", nullable: false),
                     CanUploadFiles = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -133,29 +105,7 @@ namespace AccounteeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IdCompany = table.Column<int>(type: "integer", nullable: true),
-                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
-                    TotalPrice = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ServiceEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ServiceEntity_Companies_IdCompany",
-                        column: x => x.IdCompany,
-                        principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OutcomeEntity",
+                name: "Outcomes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -170,23 +120,23 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OutcomeEntity", x => x.Id);
+                    table.PrimaryKey("PK_Outcomes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OutcomeEntity_Companies_IdCompany",
+                        name: "FK_Outcomes_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OutcomeEntity_OutcomeCategoryEntity_IdCategory",
+                        name: "FK_Outcomes_IncomeCategories_IdCategory",
                         column: x => x.IdCategory,
-                        principalTable: "OutcomeCategoryEntity",
+                        principalTable: "IncomeCategories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductEntity",
+                name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -201,19 +151,48 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductEntity", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductEntity_Companies_IdCompany",
+                        name: "FK_Products_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductEntity_ProductCategoryEntity_IdCategory",
+                        name: "FK_Products_IncomeCategories_IdCategory",
                         column: x => x.IdCategory,
-                        principalTable: "ProductCategoryEntity",
+                        principalTable: "IncomeCategories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Services",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IdCompany = table.Column<int>(type: "integer", nullable: true),
+                    IdCategory = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
+                    TotalPrice = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Services", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Services_Companies_IdCompany",
+                        column: x => x.IdCompany,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Services_IncomeCategories_IdCategory",
+                        column: x => x.IdCategory,
+                        principalTable: "IncomeCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -251,7 +230,41 @@ namespace AccounteeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IncomeEntity",
+                name: "OutcomeProducts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IdCompany = table.Column<int>(type: "integer", nullable: true),
+                    IdProduct = table.Column<int>(type: "integer", nullable: false),
+                    IdOutcome = table.Column<int>(type: "integer", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutcomeProducts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OutcomeProducts_Companies_IdCompany",
+                        column: x => x.IdCompany,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OutcomeProducts_Outcomes_IdOutcome",
+                        column: x => x.IdOutcome,
+                        principalTable: "Outcomes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OutcomeProducts_Products_IdProduct",
+                        column: x => x.IdProduct,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Incomes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -267,63 +280,29 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IncomeEntity", x => x.Id);
+                    table.PrimaryKey("PK_Incomes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IncomeEntity_Companies_IdCompany",
+                        name: "FK_Incomes_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IncomeEntity_IncomeCategoryEntity_IdCategory",
+                        name: "FK_Incomes_IncomeCategories_IdCategory",
                         column: x => x.IdCategory,
-                        principalTable: "IncomeCategoryEntity",
+                        principalTable: "IncomeCategories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IncomeEntity_ServiceEntity_IdService",
+                        name: "FK_Incomes_Services_IdService",
                         column: x => x.IdService,
-                        principalTable: "ServiceEntity",
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OutcomeProductEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IdCompany = table.Column<int>(type: "integer", nullable: true),
-                    IdProduct = table.Column<int>(type: "integer", nullable: false),
-                    IdOutcome = table.Column<int>(type: "integer", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OutcomeProductEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OutcomeProductEntity_Companies_IdCompany",
-                        column: x => x.IdCompany,
-                        principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OutcomeProductEntity_OutcomeEntity_IdOutcome",
-                        column: x => x.IdOutcome,
-                        principalTable: "OutcomeEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OutcomeProductEntity_ProductEntity_IdProduct",
-                        column: x => x.IdProduct,
-                        principalTable: "ProductEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ServiceProductEntity",
+                name: "ServiceProducts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -336,29 +315,29 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceProductEntity", x => x.Id);
+                    table.PrimaryKey("PK_ServiceProducts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ServiceProductEntity_Companies_IdCompany",
+                        name: "FK_ServiceProducts_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ServiceProductEntity_ProductEntity_IdProduct",
+                        name: "FK_ServiceProducts_Products_IdProduct",
                         column: x => x.IdProduct,
-                        principalTable: "ProductEntity",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ServiceProductEntity_ServiceEntity_IdService",
+                        name: "FK_ServiceProducts_Services_IdService",
                         column: x => x.IdService,
-                        principalTable: "ServiceEntity",
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserServiceEntity",
+                name: "UserServices",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -369,21 +348,21 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserServiceEntity", x => x.Id);
+                    table.PrimaryKey("PK_UserServices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserServiceEntity_Companies_IdCompany",
+                        name: "FK_UserServices_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserServiceEntity_ServiceEntity_IdService",
+                        name: "FK_UserServices_Services_IdService",
                         column: x => x.IdService,
-                        principalTable: "ServiceEntity",
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserServiceEntity_Users_IdUser",
+                        name: "FK_UserServices_Users_IdUser",
                         column: x => x.IdUser,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -391,7 +370,7 @@ namespace AccounteeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IncomeProductEntity",
+                name: "IncomeProducts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -403,29 +382,29 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IncomeProductEntity", x => x.Id);
+                    table.PrimaryKey("PK_IncomeProducts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IncomeProductEntity_Companies_IdCompany",
+                        name: "FK_IncomeProducts_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IncomeProductEntity_IncomeEntity_IdIncome",
+                        name: "FK_IncomeProducts_Incomes_IdIncome",
                         column: x => x.IdIncome,
-                        principalTable: "IncomeEntity",
+                        principalTable: "Incomes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IncomeProductEntity_ProductEntity_IdProduct",
+                        name: "FK_IncomeProducts_Products_IdProduct",
                         column: x => x.IdProduct,
-                        principalTable: "ProductEntity",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserIncomeEntity",
+                name: "UserIncomes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -437,21 +416,21 @@ namespace AccounteeApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserIncomeEntity", x => x.Id);
+                    table.PrimaryKey("PK_UserIncomes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserIncomeEntity_Companies_IdCompany",
+                        name: "FK_UserIncomes_Companies_IdCompany",
                         column: x => x.IdCompany,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserIncomeEntity_IncomeEntity_IdIncome",
+                        name: "FK_UserIncomes_Incomes_IdIncome",
                         column: x => x.IdIncome,
-                        principalTable: "IncomeEntity",
+                        principalTable: "Incomes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserIncomeEntity_Users_IdUser",
+                        name: "FK_UserIncomes_Users_IdUser",
                         column: x => x.IdUser,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -460,87 +439,77 @@ namespace AccounteeApi.Migrations
 
             migrationBuilder.InsertData(
                 table: "Roles",
-                columns: new[] { "Id", "CanCreateCompany", "CanCreateOutlay", "CanCreateRoles", "CanDeleteCompany", "CanDeleteOutlay", "CanDeleteRoles", "CanDeleteUsers", "CanEditCompany", "CanEditOutlay", "CanEditRoles", "CanEditUsers", "CanReadOutlay", "CanReadRoles", "CanReadUsers", "CanRegisterUsers", "CanUploadFiles", "Description", "IdCompany", "IsAdmin", "Name" },
-                values: new object[] { 1, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, null, null, false, "Visitor" });
+                columns: new[] { "Id", "CanCreateCategories", "CanCreateCompany", "CanCreateOutlay", "CanCreateProducts", "CanCreateRoles", "CanCreateServices", "CanDeleteCategories", "CanDeleteCompany", "CanDeleteOutlay", "CanDeleteProducts", "CanDeleteRoles", "CanDeleteServices", "CanDeleteUsers", "CanEditCategories", "CanEditCompany", "CanEditOutlay", "CanEditProducts", "CanEditRoles", "CanEditServices", "CanEditUsers", "CanReadCategories", "CanReadOutlay", "CanReadProducts", "CanReadRoles", "CanReadServices", "CanReadUsers", "CanRegisterUsers", "CanUploadFiles", "Description", "IdCompany", "IsAdmin", "Name" },
+                values: new object[] { 1, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, null, null, false, "Visitor" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeCategoryEntity_IdCompany",
-                table: "IncomeCategoryEntity",
+                name: "IX_IncomeCategories_CompanyId",
+                table: "IncomeCategories",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IncomeProducts_IdCompany",
+                table: "IncomeProducts",
                 column: "IdCompany");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeEntity_IdCategory",
-                table: "IncomeEntity",
-                column: "IdCategory");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IncomeEntity_IdCompany",
-                table: "IncomeEntity",
-                column: "IdCompany");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IncomeEntity_IdService",
-                table: "IncomeEntity",
-                column: "IdService");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IncomeProductEntity_IdCompany",
-                table: "IncomeProductEntity",
-                column: "IdCompany");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IncomeProductEntity_IdIncome",
-                table: "IncomeProductEntity",
+                name: "IX_IncomeProducts_IdIncome",
+                table: "IncomeProducts",
                 column: "IdIncome");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeProductEntity_IdProduct",
-                table: "IncomeProductEntity",
+                name: "IX_IncomeProducts_IdProduct",
+                table: "IncomeProducts",
                 column: "IdProduct");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutcomeCategoryEntity_IdCompany",
-                table: "OutcomeCategoryEntity",
-                column: "IdCompany");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OutcomeEntity_IdCategory",
-                table: "OutcomeEntity",
+                name: "IX_Incomes_IdCategory",
+                table: "Incomes",
                 column: "IdCategory");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutcomeEntity_IdCompany",
-                table: "OutcomeEntity",
+                name: "IX_Incomes_IdCompany",
+                table: "Incomes",
                 column: "IdCompany");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutcomeProductEntity_IdCompany",
-                table: "OutcomeProductEntity",
+                name: "IX_Incomes_IdService",
+                table: "Incomes",
+                column: "IdService");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutcomeProducts_IdCompany",
+                table: "OutcomeProducts",
                 column: "IdCompany");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutcomeProductEntity_IdOutcome",
-                table: "OutcomeProductEntity",
+                name: "IX_OutcomeProducts_IdOutcome",
+                table: "OutcomeProducts",
                 column: "IdOutcome");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutcomeProductEntity_IdProduct",
-                table: "OutcomeProductEntity",
+                name: "IX_OutcomeProducts_IdProduct",
+                table: "OutcomeProducts",
                 column: "IdProduct");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductCategoryEntity_IdCompany",
-                table: "ProductCategoryEntity",
-                column: "IdCompany");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductEntity_IdCategory",
-                table: "ProductEntity",
+                name: "IX_Outcomes_IdCategory",
+                table: "Outcomes",
                 column: "IdCategory");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductEntity_IdCompany_Name",
-                table: "ProductEntity",
+                name: "IX_Outcomes_IdCompany",
+                table: "Outcomes",
+                column: "IdCompany");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_IdCategory",
+                table: "Products",
+                column: "IdCategory");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_IdCompany_Name",
+                table: "Products",
                 columns: new[] { "IdCompany", "Name" },
                 unique: true);
 
@@ -551,39 +520,44 @@ namespace AccounteeApi.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceEntity_IdCompany_Name",
-                table: "ServiceEntity",
+                name: "IX_ServiceProducts_IdCompany",
+                table: "ServiceProducts",
+                column: "IdCompany");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceProducts_IdProduct",
+                table: "ServiceProducts",
+                column: "IdProduct");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceProducts_IdService",
+                table: "ServiceProducts",
+                column: "IdService");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Services_IdCategory",
+                table: "Services",
+                column: "IdCategory");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Services_IdCompany_Name",
+                table: "Services",
                 columns: new[] { "IdCompany", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceProductEntity_IdCompany",
-                table: "ServiceProductEntity",
+                name: "IX_UserIncomes_IdCompany",
+                table: "UserIncomes",
                 column: "IdCompany");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceProductEntity_IdProduct",
-                table: "ServiceProductEntity",
-                column: "IdProduct");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ServiceProductEntity_IdService",
-                table: "ServiceProductEntity",
-                column: "IdService");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserIncomeEntity_IdCompany",
-                table: "UserIncomeEntity",
-                column: "IdCompany");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserIncomeEntity_IdIncome",
-                table: "UserIncomeEntity",
+                name: "IX_UserIncomes_IdIncome",
+                table: "UserIncomes",
                 column: "IdIncome");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserIncomeEntity_IdUser",
-                table: "UserIncomeEntity",
+                name: "IX_UserIncomes_IdUser",
+                table: "UserIncomes",
                 column: "IdUser");
 
             migrationBuilder.CreateIndex(
@@ -598,18 +572,18 @@ namespace AccounteeApi.Migrations
                 column: "IdRole");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserServiceEntity_IdCompany",
-                table: "UserServiceEntity",
+                name: "IX_UserServices_IdCompany",
+                table: "UserServices",
                 column: "IdCompany");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserServiceEntity_IdService",
-                table: "UserServiceEntity",
+                name: "IX_UserServices_IdService",
+                table: "UserServices",
                 column: "IdService");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserServiceEntity_IdUser",
-                table: "UserServiceEntity",
+                name: "IX_UserServices_IdUser",
+                table: "UserServices",
                 column: "IdUser");
         }
 
@@ -617,46 +591,40 @@ namespace AccounteeApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "IncomeProductEntity");
+                name: "IncomeProducts");
 
             migrationBuilder.DropTable(
-                name: "OutcomeProductEntity");
+                name: "OutcomeProducts");
 
             migrationBuilder.DropTable(
-                name: "ServiceProductEntity");
+                name: "ServiceProducts");
 
             migrationBuilder.DropTable(
-                name: "UserIncomeEntity");
+                name: "UserIncomes");
 
             migrationBuilder.DropTable(
-                name: "UserServiceEntity");
+                name: "UserServices");
 
             migrationBuilder.DropTable(
-                name: "OutcomeEntity");
+                name: "Outcomes");
 
             migrationBuilder.DropTable(
-                name: "ProductEntity");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "IncomeEntity");
+                name: "Incomes");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "OutcomeCategoryEntity");
-
-            migrationBuilder.DropTable(
-                name: "ProductCategoryEntity");
-
-            migrationBuilder.DropTable(
-                name: "IncomeCategoryEntity");
-
-            migrationBuilder.DropTable(
-                name: "ServiceEntity");
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "IncomeCategories");
 
             migrationBuilder.DropTable(
                 name: "Companies");

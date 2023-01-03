@@ -21,5 +21,21 @@ public enum UserRights
     CanCreateOutlay,
     CanEditOutlay,
     CanDeleteOutlay,
-    CanUploadFiles 
+    
+    CanReadProducts,
+    CanCreateProducts,
+    CanEditProducts,
+    CanDeleteProducts,
+    
+    CanReadServices,
+    CanCreateServices,
+    CanEditServices,
+    CanDeleteServices,
+    
+    CanReadCategories,
+    CanCreateCategories,
+    CanEditCategories,
+    CanDeleteCategories,
+    
+    CanUploadFiles
 }

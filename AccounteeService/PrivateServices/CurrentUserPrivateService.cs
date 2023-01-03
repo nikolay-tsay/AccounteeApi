@@ -63,6 +63,21 @@ public class CurrentUserPrivateService : ICurrentUserPrivateService
             UserRights.CanEditOutlay => user.Role.CanEditOutlay,
             UserRights.CanDeleteOutlay => user.Role.CanDeleteOutlay,
             
+            UserRights.CanReadProducts => user.Role.CanReadProducts,
+            UserRights.CanCreateProducts => user.Role.CanCreateProducts,
+            UserRights.CanEditProducts => user.Role.CanEditProducts,
+            UserRights.CanDeleteProducts => user.Role.CanDeleteProducts,
+            
+            UserRights.CanReadServices => user.Role.CanReadServices,
+            UserRights.CanCreateServices => user.Role.CanCreateServices,
+            UserRights.CanEditServices => user.Role.CanEditServices,
+            UserRights.CanDeleteServices => user.Role.CanDeleteServices,
+            
+            UserRights.CanReadCategories => user.Role.CanReadCategories,
+            UserRights.CanCreateCategories => user.Role.CanCreateCategories,
+            UserRights.CanEditCategories => user.Role.CanEditCategories,
+            UserRights.CanDeleteCategories => user.Role.CanDeleteCategories,
+            
             UserRights.CanUploadFiles => user.Role.CanUploadFiles,
             _ => false
         };
