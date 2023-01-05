@@ -23,7 +23,7 @@ public class IncomeEntity : IBaseWithCompany
     public CompanyEntity? Company { get; set; }
     public ServiceEntity? Service { get; set; }
     public CategoryEntity IncomeCategory { get; set; } = null!;
-    
+
     public IEnumerable<UserIncomeEntity>? UserIncomeList { get; set; }
     public IEnumerable<IncomeProductEntity>? IncomeProductList { get; set; }
 }

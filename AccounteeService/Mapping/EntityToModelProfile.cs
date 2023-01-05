@@ -29,7 +29,7 @@ public class EntityToModelProfile : Profile
             .ForMember(x => x.CategoryName, opt 
                 => opt.MapFrom(x => x.IncomeCategory.Name))
             .ForMember(x => x.ServiceName, opt
-                => opt.Condition(x => string.IsNullOrWhiteSpace(x.Service?.Name)));
+                => opt.MapFrom(x => x.Service != null ? x.Service.Name : string.Empty));
         
         CreateMap<PagedList<IncomeEntity>, PagedList<IncomeDto>>()
             .ForMember(d => d.Items, 
@@ -77,7 +77,7 @@ public class EntityToModelProfile : Profile
             .ForMember(x => x.CategoryName, opt
                 => opt.MapFrom(x => x.IncomeCategory.Name))
             .ForMember(x => x.ServiceName, opt
-                => opt.Condition(x => string.IsNullOrWhiteSpace(x.Service?.Name)))
+                => opt.MapFrom(x => x.Service != null ? x.Service.Name : string.Empty))
             .ForMember(x => x.UserList, opt 
                 => opt.MapFrom(x => x.UserIncomeList))
             .ForMember(x => x.ProductList, opt
