@@ -47,6 +47,7 @@ public class IncomePublicService : IIncomePublicService
         
         var userIncomes = await AccounteeContext.UserIncomes
             .AsNoTracking()
+            .Include(x => x.Income.IncomeCategory)
             .Where(x => x.IdUser == userId)
             .Select(x => x.Income)
             .ToPagedList(filter, cancellationToken);
