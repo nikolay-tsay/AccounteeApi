@@ -10,6 +10,6 @@ public class CreateIncomeRequest
     public DateTime LastEdited { get; set; }
     public decimal TotalAmount { get; set; }
 
-    public IEnumerable<int>? ProductIds { get; set; }
-    public IEnumerable<int>? UserIds { get; set; }
+    public IEnumerable<ProductToIncomeRequest>? ProductToIncomeRequests { get; set; }
+    public IEnumerable<UserToIncomeRequest>? UserToIncomeRequests { get; set; }
 }

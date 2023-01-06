@@ -1,5 +1,6 @@
 ﻿using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
+using AccounteeService.Contracts.Requests;
 using AutoMapper;
 
 namespace AccounteeService.Mapping;
@@ -11,5 +12,6 @@ public class ModelToEntityProfile : Profile
         CreateMap<RoleDto, RoleEntity>();
         CreateMap<CategoryDto, CategoryEntity>();
         CreateMap<ProductDto, ProductEntity>();
+        CreateMap<CreateIncomeRequest, IncomeEntity>();
     }
 }
