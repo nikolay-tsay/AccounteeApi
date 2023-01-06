@@ -63,22 +63,31 @@ public class IncomeController : BaseController
 
         return Ok(result);
     }
+    
+    [HttpDelete("Income/{incomeId}")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteIncome(int incomeId, CancellationToken cancellationToken)
+    {
+        var result = await IncomePublicService.DeleteIncome(incomeId, cancellationToken);
 
-    [HttpPost("Income/{incomeId}/Product/{productId}")]
+        return Ok(result);
+    }
+    
+    [HttpPost("Income/{incomeId}/Product")]
     [ProducesResponseType(typeof(IncomeDetailModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddProductToIncome(int incomeId, int productId,
+    public async Task<IActionResult> AddProductToIncome(int incomeId, IEnumerable<ProductToIncomeRequest> requests,
         CancellationToken cancellationToken)
     {
-        var result = await IncomePublicService.AddProductToIncome(incomeId, productId, cancellationToken);
+        var result = await IncomePublicService.AddProductToIncome(incomeId, requests, cancellationToken);
 
         return Ok(result);
     }
 
-    [HttpDelete("Income/{incomeId}/Product/{productId}")]
+    [HttpDelete("Income/{incomeId}/Product")]
     [ProducesResponseType(typeof(IncomeDetailModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteProductFromIncome(int incomeId, int productId, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteProductFromIncome(int incomeId, IEnumerable<ProductToIncomeRequest> requests, CancellationToken cancellationToken)
     {
-        var result = await IncomePublicService.DeleteProductFromIncome(incomeId, productId, cancellationToken);
+        var result = await IncomePublicService.DeleteProductFromIncome(incomeId, requests, cancellationToken);
 
         return Ok(result);
     }

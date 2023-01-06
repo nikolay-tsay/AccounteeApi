@@ -13,6 +13,7 @@ public interface IIncomePublicService
     Task<IncomeDetailModel> GetIncomeDetails(int incomeId, CancellationToken cancellationToken);
     Task<bool> CreateIncome(CreateIncomeRequest request, CancellationToken cancellationToken);
     Task<IncomeDetailModel> EditIncome(IncomeDto model, int incomeId, CancellationToken cancellationToken);
-    Task<IncomeDetailModel> AddProductToIncome(int incomeId, int productId, CancellationToken cancellationToken);
-    Task<IncomeDetailModel> DeleteProductFromIncome(int incomeId, int productId, CancellationToken cancellationToken);
+    Task<bool> DeleteIncome(int incomeId, CancellationToken cancellationToken);
+    Task<IncomeDetailModel> AddProductToIncome(int incomeId, IEnumerable<ProductToIncomeRequest> requests, CancellationToken cancellationToken);
+    Task<IncomeDetailModel> DeleteProductFromIncome(int incomeId, IEnumerable<ProductToIncomeRequest> requests, CancellationToken cancellationToken);
 }
