@@ -8,8 +8,8 @@ namespace AccounteeService.PublicServices.Interfaces;
 
 public interface IIncomePublicService
 {
-    Task<PagedList<IncomeDto>> GetIncomes(PageFilter filter, CancellationToken cancellationToken);
-    Task<PagedList<IncomeDto>> GetUserIncomes(int? userId, PageFilter filter, CancellationToken cancellationToken);
+    Task<PagedList<IncomeDto>> GetIncomes(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
+    Task<PagedList<IncomeDto>> GetUserIncomes(int? userId, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
     Task<IncomeDetailModel> GetIncomeDetails(int incomeId, CancellationToken cancellationToken);
     Task<bool> CreateIncome(CreateIncomeRequest request, CancellationToken cancellationToken);
     Task<IncomeDetailModel> EditIncome(IncomeDto model, int incomeId, CancellationToken cancellationToken);

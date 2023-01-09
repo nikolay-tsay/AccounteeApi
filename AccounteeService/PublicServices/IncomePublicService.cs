@@ -28,20 +28,21 @@ public class IncomePublicService : IIncomePublicService
         Mapper = mapper;
     }
     
-    public async Task<PagedList<IncomeDto>> GetIncomes(PageFilter filter, CancellationToken cancellationToken)
+    public async Task<PagedList<IncomeDto>> GetIncomes(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadOutlay, cancellationToken);
 
         var incomes = await AccounteeContext.Incomes
             .AsNoTracking()
-            .ToPagedList(filter, cancellationToken);
+            .FilterOrder(orderFilter)
+            .ToPagedList(pageFilter, cancellationToken);
 
         var mapped = Mapper.Map<PagedList<IncomeEntity>, PagedList<IncomeDto>>(incomes);
 
         return mapped;
     }
 
-    public async Task<PagedList<IncomeDto>> GetUserIncomes(int? userId, PageFilter filter, CancellationToken cancellationToken)
+    public async Task<PagedList<IncomeDto>> GetUserIncomes(int? userId, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadOutlay, cancellationToken);
         
@@ -50,7 +51,8 @@ public class IncomePublicService : IIncomePublicService
             .Include(x => x.Income.IncomeCategory)
             .Where(x => x.IdUser == userId)
             .Select(x => x.Income)
-            .ToPagedList(filter, cancellationToken);
+            .FilterOrder(orderFilter)
+            .ToPagedList(pageFilter, cancellationToken);
 
         var mapped = Mapper.Map<PagedList<IncomeEntity>, PagedList<IncomeDto>>(userIncomes);
 

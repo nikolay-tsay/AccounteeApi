@@ -17,9 +17,9 @@ public class ProductController : BaseController
 
     [HttpGet("Product")]
     [ProducesResponseType(typeof(PagedList<ProductDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProducts([FromQuery] PageFilter filter, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetProducts([FromQuery] OrderFilter orderFilter, [FromQuery] PageFilter pageFilter, CancellationToken cancellationToken)
     {
-        var result = await ProductPublicService.GetProducts(filter, cancellationToken);
+        var result = await ProductPublicService.GetProducts(orderFilter, pageFilter, cancellationToken);
 
         return Ok(result);
     }

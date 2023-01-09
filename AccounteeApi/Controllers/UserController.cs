@@ -19,9 +19,9 @@ public class UserController : BaseController
 
     [HttpGet("User")]
     [ProducesResponseType(typeof(PagedList<UserDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUsers([FromQuery]PageFilter filter, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUsers([FromQuery] OrderFilter orderFilter, [FromQuery] PageFilter pageFilter, CancellationToken cancellationToken)
     {
-        var result = await UserPublicService.GetUsers(filter, cancellationToken);
+        var result = await UserPublicService.GetUsers(orderFilter, pageFilter, cancellationToken);
 
         return Ok(result);
     }

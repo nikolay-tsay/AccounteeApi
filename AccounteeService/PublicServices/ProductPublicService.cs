@@ -27,13 +27,14 @@ public class ProductPublicService : IProductPublicService
         Mapper = mapper;
     }
 
-    public async Task<PagedList<ProductDto>> GetProducts(PageFilter filter, CancellationToken cancellationToken)
+    public async Task<PagedList<ProductDto>> GetProducts(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadProducts, cancellationToken);
 
         var products = await AccounteeContext.Products
             .AsNoTracking()
-            .ToPagedList(filter, cancellationToken);
+            .FilterOrder(orderFilter)
+            .ToPagedList(pageFilter, cancellationToken);
 
         var mapped = Mapper.Map<PagedList<ProductEntity>, PagedList<ProductDto>>(products);
 
@@ -70,7 +71,7 @@ public class ProductPublicService : IProductPublicService
         {
             throw new AccounteeException();
         }
-        
+
         newProduct.IdCompany = GlobalHttpContext.GetCompanyId();
 
         AccounteeContext.Products.Add(newProduct);

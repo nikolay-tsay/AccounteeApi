@@ -51,4 +51,40 @@ public static class QueryExtension
 
         return paged;
     }
+    
+    public static IOrderedQueryable<T> FilterOrder<T>(this IQueryable<T> query, OrderFilter orderFilter)
+    {
+        if (orderFilter.PropertyName == null)
+        {
+            return (IOrderedQueryable<T>)query;
+        }
+        
+        var type = typeof(T);
+        var propInfo = type.GetProperty(orderFilter.PropertyName!);
+
+        if (propInfo == null)
+        {
+            return (IOrderedQueryable<T>)query;
+        }
+
+        var typeParams = new []
+        {
+            Expression.Parameter(type, string.Empty)
+        };
+        
+        var method = orderFilter.IsDescending == true
+            ? "OrderByDescending" 
+            : "OrderBy";
+        
+        var result = (IOrderedQueryable<T>)query.Provider.CreateQuery(
+            Expression.Call(
+                typeof(Queryable),
+                method,
+                new[] { type, propInfo.PropertyType },
+                query.Expression,
+                Expression.Lambda(Expression.Property(typeParams[0], propInfo), typeParams))
+        );
+
+        return result;
+    }
 }

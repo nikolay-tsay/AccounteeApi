@@ -29,13 +29,14 @@ public class UserPublicService : IUserPublicService
         PasswordHandler = passwordHandler;
     }
     
-    public async Task<PagedList<UserDto>> GetUsers(PageFilter filter, CancellationToken cancellationToken)
+    public async Task<PagedList<UserDto>> GetUsers(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadUsers, cancellationToken);
         
         var users = await AccounteeContext.Users
             .AsNoTracking()
-            .ToPagedList(filter, cancellationToken);
+            .FilterOrder(orderFilter)
+            .ToPagedList(pageFilter, cancellationToken);
         
         var mapped = Mapper.Map<PagedList<UserEntity>, PagedList<UserDto>>(users);
 

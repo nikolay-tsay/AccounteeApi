@@ -19,9 +19,9 @@ public class CategoryController : BaseController
 
     [HttpGet("Category")]
     [ProducesResponseType(typeof(PagedList<CategoryDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCategories([FromQuery] PageFilter filter, [FromQuery] CategoryTargets target, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetCategories([FromQuery] OrderFilter orderFilter, [FromQuery] PageFilter pageFilter, [FromQuery] CategoryTargets target, CancellationToken cancellationToken)
     {
-        var result = await CategoryPublicService.GetCategories(filter, target, cancellationToken);
+        var result = await CategoryPublicService.GetCategories(orderFilter, pageFilter, target, cancellationToken);
 
         return Ok(result);
     }
