@@ -60,11 +60,11 @@ public static class QueryExtension
         }
         
         var type = typeof(T);
-        var propInfo = type.GetProperty(orderFilter.PropertyName!);
+        var propInfo = type.GetProperty(orderFilter.PropertyName);
 
         if (propInfo == null)
         {
-            return (IOrderedQueryable<T>)query;
+            throw new AccounteeException();
         }
 
         var typeParams = new []
