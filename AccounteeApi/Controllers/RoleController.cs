@@ -18,9 +18,9 @@ public class RoleController : BaseController
 
     [HttpGet("Role")]
     [ProducesResponseType(typeof(PagedList<RoleDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetRoles([FromQuery] PageFilter filter, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetRoles([FromQuery] OrderFilter orderFilter, [FromQuery] PageFilter pageFilter, CancellationToken cancellationToken)
     {
-        var result = await RolePublicService.GetRoles(filter, cancellationToken);
+        var result = await RolePublicService.GetRoles(orderFilter, pageFilter, cancellationToken);
 
         return Ok(result);
     }

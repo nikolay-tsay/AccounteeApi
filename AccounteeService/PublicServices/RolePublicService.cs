@@ -27,13 +27,14 @@ public class RolePublicService : IRolePublicService
         Mapper = mapper;
     }
 
-    public async Task<PagedList<RoleDto>> GetRoles(PageFilter filter, CancellationToken cancellationToken)
+    public async Task<PagedList<RoleDto>> GetRoles(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadRoles, cancellationToken);
 
         var roles = await AccounteeContext.Roles
             .AsNoTracking()
-            .ToPagedList(filter, cancellationToken);
+            .FilterOrder(orderFilter)
+            .ToPagedList(pageFilter, cancellationToken);
         
         var mapped = Mapper.Map<PagedList<RoleEntity>, PagedList<RoleDto>>(roles);
 

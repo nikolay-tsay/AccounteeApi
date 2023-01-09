@@ -28,14 +28,15 @@ public class CategoryPublicService : ICategoryPublicService
         Mapper = mapper;
     }
     
-    public async Task<PagedList<CategoryDto>> GetCategories(PageFilter filter, CategoryTargets target, CancellationToken cancellationToken)
+    public async Task<PagedList<CategoryDto>> GetCategories(OrderFilter orderFilter, PageFilter pageFilter, CategoryTargets target, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadCategories, cancellationToken);
 
         var categories = await AccounteeContext.Categories
             .AsNoTracking()
             .Where(x => x.Target == target)
-            .ToPagedList(filter, cancellationToken);
+            .FilterOrder(orderFilter)
+            .ToPagedList(pageFilter, cancellationToken);
 
         var mapped = Mapper.Map<PagedList<CategoryDto>>(categories);
 

@@ -20,18 +20,18 @@ public class IncomeController : BaseController
     
     [HttpGet("Income")]
     [ProducesResponseType(typeof(PagedList<IncomeDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetIncomes([FromQuery] PageFilter filter, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetIncomes([FromQuery] OrderFilter orderFilter, [FromQuery] PageFilter pageFilter, CancellationToken cancellationToken)
     {
-        var result = await IncomePublicService.GetIncomes(filter, cancellationToken);
+        var result = await IncomePublicService.GetIncomes(orderFilter, pageFilter, cancellationToken);
 
         return Ok(result);
     }
 
     [HttpGet("Income/User/{userId}")]
     [ProducesResponseType(typeof(PagedList<IncomeDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUserIncomes(int? userId, [FromQuery] PageFilter filter, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUserIncomes(int? userId, [FromQuery] OrderFilter orderFilter, [FromQuery] PageFilter pageFilter, CancellationToken cancellationToken)
     {
-        var result = await IncomePublicService.GetUserIncomes(userId, filter, cancellationToken);
+        var result = await IncomePublicService.GetUserIncomes(userId, orderFilter, pageFilter, cancellationToken);
 
         return Ok(result);
     }
