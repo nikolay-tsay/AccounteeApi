@@ -13,5 +13,6 @@ public class ModelToEntityProfile : Profile
         CreateMap<CategoryDto, CategoryEntity>();
         CreateMap<ProductDto, ProductEntity>();
         CreateMap<CreateIncomeRequest, IncomeEntity>();
+        CreateMap<ServiceDto, ServiceEntity>();
     }
 }

@@ -144,6 +144,7 @@ public static class StartupExtension
         app.MapRoleEndpoints();
         app.MapProductEndpoints();
         app.MapIncomeEndpoints();
+        app.MapServiceEndpoints();
     }
 
     private static void AddServices(this WebApplicationBuilder builder)
@@ -163,5 +164,6 @@ public static class StartupExtension
         builder.Services.AddScoped<IRolePublicService, RolePublicService>();
         builder.Services.AddScoped<IIncomePublicService, IncomePublicService>();
         builder.Services.AddScoped<ICategoryPublicService, CategoryPublicService>();
+        builder.Services.AddScoped<IServicePublicService, ServicePublicService>();
     }
 }
