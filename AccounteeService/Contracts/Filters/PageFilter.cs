@@ -1,7 +1,21 @@
-﻿namespace AccounteeService.Contracts.Filters;
+﻿using Microsoft.AspNetCore.Http;
 
-public class PageFilter
+namespace AccounteeService.Contracts.Filters;
+
+public record PageFilter(int PageSize, int PageNum)
 {
-    public int PageSize { get; set; }
-    public int PageNum { get; set; }
+    public static ValueTask<PageFilter?> BindAsync(HttpContext context)
+    {
+        var size = int.TryParse(context.Request.Query["pageSize"], out var pageSize)
+            ? pageSize
+            : 10;
+
+        var num = int.TryParse(context.Request.Query["pageNum"], out var pageNum)
+            ? pageNum
+            : 1;
+        
+        var filter = new PageFilter(size, num);
+
+        return ValueTask.FromResult<PageFilter?>(filter);
+    }
 }

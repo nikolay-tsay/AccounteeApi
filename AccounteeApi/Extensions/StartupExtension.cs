@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using AccounteeApi.Endpoints;
 using AccounteeApi.Middleware;
 using AccounteeCommon.HttpContexts;
 using AccounteeCommon.Options;
@@ -129,7 +130,20 @@ public static class StartupExtension
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapControllers();
+        app.MapEndpoints();
+    }
+    
+    private static void MapEndpoints(this WebApplication app)
+    {
+        app.MapSwagger();
+        
+        app.MapAuthEndpoints();
+        app.MapCategoryEndpoints();
+        app.MapCompanyEndpoints();
+        app.MapUserEndpoints();
+        app.MapRoleEndpoints();
+        app.MapProductEndpoints();
+        app.MapIncomeEndpoints();
     }
 
     private static void AddServices(this WebApplicationBuilder builder)
