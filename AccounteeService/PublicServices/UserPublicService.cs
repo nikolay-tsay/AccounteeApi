@@ -35,7 +35,6 @@ public class UserPublicService : IUserPublicService
         
         var users = await AccounteeContext.Users
             .AsNoTracking()
-            .Search("string")
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
         
