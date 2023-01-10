@@ -34,7 +34,8 @@ public class PasswordHandler : IPasswordHandler
     
     private byte[] GetHash(string input, byte[] salt)
     {
-        var pbkdf2 = new Rfc2898DeriveBytes(input, salt, PasswordOptions.Iterations);
+        
+        var pbkdf2 = new Rfc2898DeriveBytes(input, salt, PasswordOptions.Iterations, HashAlgorithmName.SHA256);
         var hashArray = pbkdf2.GetBytes(PasswordOptions.HashSize);
         return hashArray;
     }
