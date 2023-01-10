@@ -7,7 +7,7 @@ namespace AccounteeService.PublicServices.Interfaces;
 
 public interface IUserPublicService
 {
-    Task<PagedList<UserDto>> GetUsers(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
+    Task<PagedList<UserDto>> GetUsers(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
     Task<UserDto> GetUserById(int userId, CancellationToken cancellationToken);
     Task<UserDto> RegisterUser(RegistrationRequest request, CancellationToken cancellationToken);
     Task<UserDto> EditUser(int userId, UserDto model, CancellationToken cancellationToken);

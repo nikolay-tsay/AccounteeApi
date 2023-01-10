@@ -7,7 +7,6 @@ public class CreateIncomeRequest
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public DateTime DateTime { get; set; }
-    public DateTime LastEdited { get; set; }
     public decimal TotalAmount { get; set; }
 
     public IEnumerable<ProductToIncomeRequest>? ProductToIncomeRequests { get; set; }

@@ -1,4 +1,5 @@
-﻿using AccounteeDomain.Models;
+﻿using AccounteeApi.Filters;
+using AccounteeDomain.Models;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using AccounteeService.PublicServices.Interfaces;
@@ -20,6 +21,7 @@ public static class RoleEndpoints
 
         app.MapPost("Role", CreateRole)
             .RequireAuthorization()
+            .AddEndpointFilter<ValidationFilter<RoleDto>>()
             .Produces<RoleDto>();
 
         app.MapPut("Role/{roleId}", EditRole)
@@ -33,11 +35,12 @@ public static class RoleEndpoints
     
     private static async Task<IResult> GetRoles(
         IRolePublicService service,
+        [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter, 
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetRoles(orderFilter, pageFilter, cancellationToken);
+        var result = await service.GetRoles(searchValue, orderFilter, pageFilter, cancellationToken);
 
         return Results.Ok(result);
     }

@@ -1,6 +1,8 @@
-﻿using AccounteeCommon.Enums;
+﻿using System.Globalization;
+using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
 using AccounteeCommon.HttpContexts;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Entities.Enums;
@@ -28,13 +30,14 @@ public class CategoryPublicService : ICategoryPublicService
         Mapper = mapper;
     }
     
-    public async Task<PagedList<CategoryDto>> GetCategories(OrderFilter orderFilter, PageFilter pageFilter, CategoryTargets target, CancellationToken cancellationToken)
+    public async Task<PagedList<CategoryDto>> GetCategories(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CategoryTargets target, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadCategories, cancellationToken);
 
         var categories = await AccounteeContext.Categories
             .AsNoTracking()
             .Where(x => x.Target == target)
+            .ApplySearch(searchValue)
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
 
@@ -50,7 +53,8 @@ public class CategoryPublicService : ICategoryPublicService
         var newCategory = Mapper.Map<CategoryEntity>(model);
         if (newCategory == null)
         {
-            throw new AccounteeException();
+            throw new AccounteeException(ResourceRetriever.Get(CultureInfo.CurrentCulture, 
+                nameof(Resources.MappingError), new object[] {nameof(CategoryDto), nameof(CategoryEntity)}));
         }
 
         newCategory.IdCompany = GlobalHttpContext.GetCompanyId();

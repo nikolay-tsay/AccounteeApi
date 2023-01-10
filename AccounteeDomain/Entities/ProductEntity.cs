@@ -5,7 +5,7 @@ using AccounteeDomain.Entities.Relational;
 
 namespace AccounteeDomain.Entities;
 
-public class ProductEntity : IBaseWithCompany
+public class ProductEntity : IBaseWithCompany, ISearchable
 {
     [Key]
     public int Id { get; set; }
@@ -20,6 +20,7 @@ public class ProductEntity : IBaseWithCompany
     public MeasurementUnits AmountUnit { get; set; }
     public decimal Amount { get; set; }
     public decimal TotalPrice { get; set; }
+    public string SearchValue => Name.ToLower();
 
     public CategoryEntity ProductCategory { get; set; } = null!;
     public CompanyEntity? Company { get; set; }

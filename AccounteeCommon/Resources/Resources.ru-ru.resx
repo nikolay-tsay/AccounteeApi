@@ -1,0 +1,38 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="UnreachableReached" xml:space="preserve">
+        <value>Ого! Это не должно было случиться {0}.</value>
+    </data>
+    <data name="InvalidPassword" xml:space="preserve">
+        <value>Неверный пароль для пользователя {0}</value>
+    </data>
+    <data name="AlreadyExists" xml:space="preserve">
+        <value>{0} уже существует </value>
+    </data>
+    <data name="MappingError" xml:space="preserve">
+        <value>Ошибка маппинга {0} -&gt; {1}</value>
+    </data>
+    <data name="UserNoCompany" xml:space="preserve">
+        <value>У пользователя {0} нет компании</value>
+    </data>
+    <data name="ExpectedDoesNotExist" xml:space="preserve">
+        <value>{0} не существует  в {1} с ID {2}</value>
+    </data>
+    <data name="InvalidAmountDelete" xml:space="preserve">
+        <value>Количество {0} больше, чем общее количество : {1}</value>
+    </data>
+    <data name="PercentMax" xml:space="preserve">
+        <value>{0} превышает максимальную величину - 100</value>
+    </data>
+</root>

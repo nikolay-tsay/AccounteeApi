@@ -4,7 +4,7 @@ using AccounteeDomain.Entities.Relational;
 
 namespace AccounteeDomain.Entities;
 
-public class OutcomeEntity : IBaseWithCompany
+public class OutcomeEntity : IBaseWithCompany, ISearchable
 {
     [Key]
     public int Id { get; set; }
@@ -16,6 +16,7 @@ public class OutcomeEntity : IBaseWithCompany
     public DateTime DateTime { get; set; }
     public DateTime LastEdited { get; set; }
     public decimal TotalPrice { get; set; }
+    public string SearchValue => Name.ToLower();
 
     public CompanyEntity? Company { get; set; }
     public CategoryEntity OutcomeCategory { get; set; } = null!;

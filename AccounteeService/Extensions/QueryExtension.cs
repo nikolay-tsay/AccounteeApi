@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AccounteeCommon.Exceptions;
+using AccounteeDomain.Entities.Base;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,51 @@ public static class QueryExtension
 
         return result;
     }
+    
+    public static T FirstOrNotFound<T>(this IEnumerable<T> query, Func<T, bool> predicate)
+    {
+        var result = query.FirstOrDefault(predicate);
 
+        if (result == null)
+        {
+            throw new AccounteeNotFoundException();
+        }
+
+        return result;
+    }
+    
+    public static T FirstOrNotFound<T>(this IEnumerable<T> query)
+    {
+        var result = query.FirstOrDefault();
+
+        if (result == null)
+        {
+            throw new AccounteeNotFoundException();
+        }
+
+        return result;
+    }
+
+    public static IQueryable<T> TrackIf<T>(this IQueryable<T> source, bool condition) where T: class
+    {
+        if (condition)
+        {
+            return source;
+        }
+
+        return source.AsNoTracking();
+    }
+
+    public static IQueryable<T> ApplySearch<T>(this IQueryable<T> source, string? searchValue) where T : ISearchable
+    {
+        if (string.IsNullOrWhiteSpace(searchValue))
+        {
+            return source;
+        }
+        
+        return source.Where(x => x.SearchValue.Contains(searchValue));
+    }
+    
     public static async Task<PagedList<T>> ToPagedList<T>(this IQueryable<T> source, PageFilter filter, CancellationToken cancellationToken)
     {
         var paged = new PagedList<T>

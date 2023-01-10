@@ -1,4 +1,5 @@
-﻿using AccounteeDomain.Models;
+﻿using AccounteeApi.Filters;
+using AccounteeDomain.Models;
 using AccounteeService.Contracts.Requests;
 using AccounteeService.PublicServices.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ public static class AuthEndpoints
 
         app.MapPost("Auth/Register", Register)
             .AllowAnonymous()
+            .AddEndpointFilter<ValidationFilter<RegistrationRequest>>()
             .Produces<UserDto>();
 
         app.MapPut("Auth/ChangePassword", ChangePassword)
