@@ -6,7 +6,7 @@ namespace AccounteeService.PublicServices.Interfaces;
 
 public interface IProductPublicService
 {
-    Task<PagedList<ProductDto>> GetProducts(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
+    Task<PagedList<ProductDto>> GetProducts(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
     Task<ProductDto> GetProductById(int productId, CancellationToken cancellationToken);
     Task<ProductDto> CreateProduct(ProductDto model, CancellationToken cancellationToken);
     Task<ProductDto> EditProduct(int productId, ProductDto model, CancellationToken cancellationToken);

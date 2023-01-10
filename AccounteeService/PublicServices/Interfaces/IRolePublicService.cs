@@ -6,7 +6,7 @@ namespace AccounteeService.PublicServices.Interfaces;
 
 public interface IRolePublicService
 {
-    Task<PagedList<RoleDto>> GetRoles(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
+    Task<PagedList<RoleDto>> GetRoles(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken);
     Task<RoleDto> GetRoleById(int roleId, CancellationToken cancellationToken);
     Task<RoleDto> CreateRole(RoleDto model, CancellationToken cancellationToken);
     Task<RoleDto> EditRole(int roleId, RoleDto model, CancellationToken cancellationToken);

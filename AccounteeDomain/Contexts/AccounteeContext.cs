@@ -51,6 +51,7 @@ public class AccounteeContext : DbContext
 
         modelBuilder.HasPostgresEnum<MeasurementUnits>();
         modelBuilder.HasPostgresEnum<CategoryTargets>();
+        modelBuilder.HasPostgresEnum<UserLanguages>();
         
         modelBuilder.Entity<CompanyEntity>()
             .HasMany<RoleEntity>(x => x.RoleList)

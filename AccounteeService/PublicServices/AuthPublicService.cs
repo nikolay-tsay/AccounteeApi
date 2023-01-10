@@ -1,9 +1,10 @@
-﻿using AccounteeCommon.Exceptions;
+﻿using System.Globalization;
+using AccounteeCommon.Exceptions;
 using AccounteeCommon.HttpContexts;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
-using AccounteeService.Contracts;
 using AccounteeService.Contracts.Requests;
 using AccounteeService.Extensions;
 using AccounteeService.PrivateServices.Interfaces;
@@ -36,17 +37,20 @@ public class AuthPublicService : IAuthPublicService
         
         var user = await AccounteeContext.Users
             .AsNoTracking()
+            .Include(x => x.Company)
             .Where(x => x.Login == login)
             .FirstOrNotFound(cancellationToken);
 
         var pwdValid = PasswordHandler.IsValid(password, user.PasswordHash, user.PasswordSalt);
         if (!pwdValid)
         {
-            throw new AccounteeUnauthorizedException();
+            throw new AccounteeUnauthorizedException(ResourceRetriever.Get(CultureInfo.CurrentCulture, 
+                nameof(Resources.InvalidPassword), user.Login));
         }
 
         var token = AuthPrivateService.GetJwtToken(user, cancellationToken);
         
+        GlobalHttpContext.SetCompanyId(user.IdCompany ?? -1);
         GlobalHttpContext.SetIgnoreCompanyFilter(false);
         return token;
     }
@@ -61,7 +65,8 @@ public class AuthPublicService : IAuthPublicService
 
         if (exists)
         {
-            throw new AccounteeException("User already exists");
+            throw new AccounteeException(ResourceRetriever.Get(CultureInfo.CurrentCulture,
+                nameof(Resources.AlreadyExists), nameof(UserEntity)));
         }
         
         PasswordHandler.CreateHash(request.Password, out string hash, out string salt);
@@ -70,6 +75,7 @@ public class AuthPublicService : IAuthPublicService
         {
             IdRole = 1,
             Login = request.Login,
+            UserLanguage = request.Language,
             PasswordHash = hash,
             PasswordSalt = salt,
             FirstName = request.FirstName,
@@ -101,7 +107,8 @@ public class AuthPublicService : IAuthPublicService
         var pwdValid = PasswordHandler.IsValid(oldPwd, user.PasswordHash, user.PasswordSalt);
         if (!pwdValid)
         {
-            throw new AccounteeUnauthorizedException("Old password is not valid");
+            throw new AccounteeUnauthorizedException(ResourceRetriever.Get(CultureInfo.CurrentCulture, 
+                nameof(Resources.InvalidPassword), user.Login));
         }
         
         PasswordHandler.CreateHash(newPwd, out string hash, out string salt);

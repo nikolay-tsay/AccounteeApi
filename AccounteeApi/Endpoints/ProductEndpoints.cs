@@ -1,4 +1,5 @@
-﻿using AccounteeDomain.Models;
+﻿using AccounteeApi.Filters;
+using AccounteeDomain.Models;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using AccounteeService.PublicServices.Interfaces;
@@ -20,6 +21,7 @@ public static class ProductEndpoints
 
         app.MapPost("Product", CreateProduct)
             .RequireAuthorization()
+            .AddEndpointFilter<ValidationFilter<ProductDto>>()
             .Produces<ProductDto>();
 
         app.MapPut("Product/{productId}", EditProduct)
@@ -37,11 +39,12 @@ public static class ProductEndpoints
     
     private static async Task<IResult> GetProducts(
         IProductPublicService service,
+        [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter, 
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetProducts(orderFilter, pageFilter, cancellationToken);
+        var result = await service.GetProducts(searchValue, orderFilter, pageFilter, cancellationToken);
 
         return Results.Ok(result);
     }

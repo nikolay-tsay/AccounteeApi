@@ -22,6 +22,7 @@ namespace AccounteeApi.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "category_targets", new[] { "product", "income", "outcome", "service" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "measurement_units", new[] { "piece", "milliliter", "litre", "kilogram", "milligram", "gram" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_languages", new[] { "english", "russian" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AccounteeDomain.Entities.CategoryEntity", b =>
@@ -187,7 +188,7 @@ namespace AccounteeApi.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<int>("IdCategory")
+                    b.Property<int?>("IdCategory")
                         .HasColumnType("integer");
 
                     b.Property<int?>("IdCompany")
@@ -604,6 +605,9 @@ namespace AccounteeApi.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<int>("UserLanguage")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdRole");
@@ -672,8 +676,7 @@ namespace AccounteeApi.Migrations
                     b.HasOne("AccounteeDomain.Entities.CategoryEntity", "ProductCategory")
                         .WithMany("ProductList")
                         .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("AccounteeDomain.Entities.CompanyEntity", "Company")
                         .WithMany("ProductList")

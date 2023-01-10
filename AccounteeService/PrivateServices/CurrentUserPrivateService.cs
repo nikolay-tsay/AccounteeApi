@@ -1,7 +1,11 @@
-﻿using AccounteeCommon.Enums;
+﻿using System.Globalization;
+using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
+using AccounteeDomain.Entities.Enums;
+using AccounteeService.Contracts.Models;
 using AccounteeService.Extensions;
 using AccounteeService.PrivateServices.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -21,18 +25,21 @@ public class CurrentUserPrivateService : ICurrentUserPrivateService
     }
 
 
-    public async Task<UserEntity> GetCurrentUser(CancellationToken cancellationToken)
+    public async Task<CurrentUser> GetCurrentUser(bool tracking, CancellationToken cancellationToken)
     {
         var userId = GetCurrentUserId();
 
         var user = await AccounteeContext.Users
-            .AsNoTracking()
+            .TrackIf(tracking)
             .Include(x => x.Role)
             .Include(x => x.Company)
             .Where(x => x.Id == userId)
             .FirstOrNotFound(cancellationToken);
 
-        return user;
+        var lng = GetSystemLanguage(user.UserLanguage);
+        var currentUser = new CurrentUser(user,  new CultureInfo(lng));
+        
+        return currentUser;
     }
 
     public void CheckUserRights(UserEntity user,UserRights toCheck)
@@ -79,7 +86,8 @@ public class CurrentUserPrivateService : ICurrentUserPrivateService
             UserRights.CanDeleteCategories => user.Role.CanDeleteCategories,
             
             UserRights.CanUploadFiles => user.Role.CanUploadFiles,
-            _ => false
+            _ => throw new AccounteeUnreachableException(ResourceRetriever.Get(CultureInfo.CurrentCulture, 
+                    nameof(Resources.UnreachableReached), toCheck))
         };
 
         if (!hasRight)
@@ -90,8 +98,8 @@ public class CurrentUserPrivateService : ICurrentUserPrivateService
 
     public async Task CheckCurrentUserRights(UserRights toCheck, CancellationToken cancellationToken)
     {
-        var user = await GetCurrentUser(cancellationToken);
-        CheckUserRights(user, toCheck);
+        var currentUser = await GetCurrentUser(false, cancellationToken);
+        CheckUserRights(currentUser.User, toCheck);
     }
 
     public int GetCurrentUserId()
@@ -103,5 +111,17 @@ public class CurrentUserPrivateService : ICurrentUserPrivateService
         }
 
         return userId;
+    }
+
+    private string GetSystemLanguage(UserLanguages language)
+    {
+        var result = language switch
+        {
+            UserLanguages.English => SystemLanguages.En.ToEnumString(),
+            UserLanguages.Russian => SystemLanguages.Ru.ToEnumString(),
+            _ => throw new AccounteeUnreachableException()
+        };
+
+        return result;
     }
 }

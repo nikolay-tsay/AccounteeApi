@@ -3,7 +3,7 @@ using AccounteeDomain.Entities.Base;
 
 namespace AccounteeDomain.Entities;
 
-public class RoleEntity : IBaseWithCompany
+public class RoleEntity : IBaseWithCompany, ISearchable
 {
     public int Id { get; set; }
     public int? IdCompany { get; set; }
@@ -13,6 +13,8 @@ public class RoleEntity : IBaseWithCompany
     
     [MaxLength(250)]
     public string? Description { get; set; }
+
+    public string SearchValue => Name.ToLower();
 
     public bool IsAdmin { get; set; }
     
