@@ -1,6 +1,7 @@
 ﻿using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
 using AccounteeCommon.HttpContexts;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Entities.Enums;
@@ -26,13 +27,15 @@ public class ServicePublicService : IServicePublicService
         AccounteeContext = accounteeContext;
         Mapper = mapper;
     }
-    public async Task<PagedList<ServiceDto>> GetServices(OrderFilter orderFilter, PageFilter pageFilter,
+    
+    public async Task<PagedList<ServiceDto>> GetServices(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter,
         CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadServices, cancellationToken);
 
         var services = await AccounteeContext.Services
             .AsNoTracking()
+            .ApplySearch(searchValue)
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
 
@@ -57,18 +60,15 @@ public class ServicePublicService : IServicePublicService
 
     public async Task<ServiceDto> CreateService(ServiceDto model, CancellationToken cancellationToken)
     {
-        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanCreateServices, cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(model.Name))
-        {
-            throw new AccounteeException();
-        }
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanCreateProducts);
 
         var newService = Mapper.Map<ServiceEntity>(model);
 
         if (newService == null)
-        {
-            throw new AccounteeException();
+        { 
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture,
+                nameof(Resources.MappingError), new object[] {nameof(ServiceDto), nameof(ServiceEntity)}));
         }
         
         newService.IdCompany = GlobalHttpContext.GetCompanyId();

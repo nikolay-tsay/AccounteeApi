@@ -1,4 +1,5 @@
-﻿using AccounteeDomain.Models;
+﻿using AccounteeApi.Filters;
+using AccounteeDomain.Models;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using AccounteeService.PublicServices.Interfaces;
@@ -20,6 +21,7 @@ public static class ServiceEndpoints
 
         app.MapPost("Service", CreateService)
             .RequireAuthorization()
+            .AddEndpointFilter<ValidationFilter<ServiceDto>>()
             .Produces<ServiceDto>();
 
         app.MapPut("Service/{serviceId}", EditService)
@@ -37,11 +39,12 @@ public static class ServiceEndpoints
 
     private static async Task<IResult> GetServices(
         IServicePublicService service,
+        [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter,
         CancellationToken cancellationToken)
     {
-        var result = await service.GetServices(orderFilter, pageFilter, cancellationToken);
+        var result = await service.GetServices(searchValue, orderFilter, pageFilter, cancellationToken);
 
         return Results.Ok(result);
     }
