@@ -5,6 +5,7 @@ using AccounteeService.Contracts.Filters;
 using AccounteeService.PrivateServices.Interfaces;
 using AccounteeCommon.Exceptions;
 using AccounteeCommon.HttpContexts;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Entities.Enums;
 using AccounteeService.Contracts;
@@ -27,12 +28,13 @@ public class ProductPublicService : IProductPublicService
         Mapper = mapper;
     }
 
-    public async Task<PagedList<ProductDto>> GetProducts(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
+    public async Task<PagedList<ProductDto>> GetProducts(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadProducts, cancellationToken);
 
         var products = await AccounteeContext.Products
             .AsNoTracking()
+            .ApplySearch(searchValue)
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
 
@@ -58,18 +60,14 @@ public class ProductPublicService : IProductPublicService
 
     public async Task<ProductDto> CreateProduct(ProductDto model, CancellationToken cancellationToken)
     {
-        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanCreateProducts, cancellationToken);
-        
-        if (string.IsNullOrWhiteSpace(model.Name))
-        {
-            throw new AccounteeException();
-        }
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanCreateProducts);
 
         var newProduct = Mapper.Map<ProductEntity>(model);
-
         if (newProduct == null)
         {
-            throw new AccounteeException();
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture,
+                nameof(Resources.MappingError), new object[] {nameof(ProductDto), nameof(ProductEntity)}));
         }
 
         newProduct.IdCompany = GlobalHttpContext.GetCompanyId();

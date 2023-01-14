@@ -14,7 +14,8 @@ namespace AccounteeApi.Migrations
         {
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:Enum:category_targets", "product,income,outcome,service")
-                .Annotation("Npgsql:Enum:measurement_units", "piece,milliliter,litre,kilogram,milligram,gram");
+                .Annotation("Npgsql:Enum:measurement_units", "piece,milliliter,litre,kilogram,milligram,gram")
+                .Annotation("Npgsql:Enum:user_languages", "english,russian");
 
             migrationBuilder.CreateTable(
                 name: "Companies",
@@ -141,7 +142,7 @@ namespace AccounteeApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IdCategory = table.Column<int>(type: "integer", nullable: false),
+                    IdCategory = table.Column<int>(type: "integer", nullable: true),
                     IdCompany = table.Column<int>(type: "integer", nullable: true),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
@@ -203,6 +204,7 @@ namespace AccounteeApi.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdRole = table.Column<int>(type: "integer", nullable: false),
                     IdCompany = table.Column<int>(type: "integer", nullable: true),
+                    UserLanguage = table.Column<int>(type: "integer", nullable: false),
                     Login = table.Column<string>(type: "character varying(25)", maxLength: 25, nullable: false),
                     PasswordHash = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     PasswordSalt = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),

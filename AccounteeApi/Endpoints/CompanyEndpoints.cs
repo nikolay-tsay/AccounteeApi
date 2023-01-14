@@ -1,4 +1,5 @@
-﻿using AccounteeDomain.Models;
+﻿using AccounteeApi.Filters;
+using AccounteeDomain.Models;
 using AccounteeService.PublicServices.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ public static class CompanyEndpoints
 
         app.MapPost("Company", CreateCompany)
             .RequireAuthorization()
+            .AddEndpointFilter<ValidationFilter<CompanyDto>>()
             .Produces<CompanyDto>();
 
         app.MapDelete("Company", DeleteCompany)

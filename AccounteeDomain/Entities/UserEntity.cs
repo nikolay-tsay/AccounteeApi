@@ -1,15 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AccounteeDomain.Entities.Base;
+using AccounteeDomain.Entities.Enums;
 using AccounteeDomain.Entities.Relational;
 
 namespace AccounteeDomain.Entities;
 
-public class UserEntity : IBaseWithCompany
+public class UserEntity : IBaseWithCompany, ISearchable
 {
     [Key]
     public int Id { get; set; }
     public int IdRole { get; set; }
     public int? IdCompany { get; set; }
+    public UserLanguages UserLanguage { get; set; }
 
     [MaxLength(25)]
     public string Login { get; set; } = null!;
@@ -33,6 +35,7 @@ public class UserEntity : IBaseWithCompany
     public string? PhoneNumber { get; set; }
 
     public decimal? IncomePercent { get; set; }
+    public string SearchValue => $"{Login.ToLower()} {FirstName.ToLower()} {LastName.ToLower()} {Email.ToLower()}";
 
     public CompanyEntity? Company { get; set; }
     public RoleEntity Role { get; set; } = null!;

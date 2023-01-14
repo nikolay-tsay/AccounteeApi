@@ -1,5 +1,6 @@
 ﻿using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Entities.Relational;
@@ -28,12 +29,13 @@ public class IncomePublicService : IIncomePublicService
         Mapper = mapper;
     }
     
-    public async Task<PagedList<IncomeDto>> GetIncomes(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
+    public async Task<PagedList<IncomeDto>> GetIncomes(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadOutlay, cancellationToken);
 
         var incomes = await AccounteeContext.Incomes
             .AsNoTracking()
+            .ApplySearch(searchValue)
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
 
@@ -42,7 +44,7 @@ public class IncomePublicService : IIncomePublicService
         return mapped;
     }
 
-    public async Task<PagedList<IncomeDto>> GetUserIncomes(int? userId, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
+    public async Task<PagedList<IncomeDto>> GetUserIncomes(int? userId, string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadOutlay, cancellationToken);
         
@@ -51,6 +53,7 @@ public class IncomePublicService : IIncomePublicService
             .Include(x => x.Income.IncomeCategory)
             .Where(x => x.IdUser == userId)
             .Select(x => x.Income)
+            .ApplySearch(searchValue)
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
 
@@ -82,17 +85,12 @@ public class IncomePublicService : IIncomePublicService
 
     public async Task<bool> CreateIncome(CreateIncomeRequest request, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanEditOutlay);
-        
-        if (string.IsNullOrWhiteSpace(request.Name))
-        {
-            throw new AccounteeException();
-        }
-        
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanEditOutlay);
+
         var newIncome = new IncomeEntity
         {
-            IdCompany = currentUser.IdCompany,
+            IdCompany = currentUser.User.IdCompany,
             IdCategory = request.IdCategory,
             IdService = request.IdService,
             Name = request.Name,
@@ -111,11 +109,6 @@ public class IncomePublicService : IIncomePublicService
         }
         
         await FillUserList(request.UserToIncomeRequests!, newIncome, cancellationToken);
-
-        if (newIncome == null)
-        {
-            throw new AccounteeException();
-        }
 
         AccounteeContext.Add(newIncome);
         await AccounteeContext.SaveChangesAsync(cancellationToken);
@@ -160,8 +153,7 @@ public class IncomePublicService : IIncomePublicService
     public async Task<IncomeDetailModel> AddProductToIncome(int incomeId, IEnumerable<ProductToIncomeRequest> requests,
         CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanEditOutlay);
+        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanEditOutlay, cancellationToken);
         
         var income = await AccounteeContext.Incomes
             .Include(x => x.IncomeCategory)
@@ -214,7 +206,8 @@ public class IncomePublicService : IIncomePublicService
     public async Task<IncomeDetailModel> DeleteProductFromIncome(int incomeId, 
         IEnumerable<ProductToIncomeRequest> requests, CancellationToken cancellationToken)
     {
-        await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanEditOutlay, cancellationToken);
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanEditOutlay);
         
         var income = await AccounteeContext.Incomes
             .Include(x => x.IncomeCategory)
@@ -224,17 +217,20 @@ public class IncomePublicService : IIncomePublicService
 
         if (income.IncomeProductList == null)
         {
-            throw new AccounteeException();
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                nameof(Resources.ExpectedDoesNotExist), 
+                new object[] {nameof(income.IncomeProductList), nameof(IncomeEntity), income.Id}));
         }
 
         foreach (var request in requests)
         {
             var toDelete = income.IncomeProductList
-                .FirstOrDefault(x => x.IdProduct == request.Id);
+                .FirstOrNotFound(x => x.IdProduct == request.Id);
 
-            if (toDelete == null || toDelete.Amount < request.Amount)
+            if (toDelete.Amount < request.Amount)
             {
-                throw new AccounteeException();
+                throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                    nameof(Resources.InvalidAmountDelete), new object[] {request.Amount, toDelete.Amount}));
             }
 
             toDelete.Amount -= request.Amount;
@@ -313,21 +309,21 @@ public class IncomePublicService : IIncomePublicService
     private async Task FillUserList(IEnumerable<UserToIncomeRequest> requests,
         IncomeEntity income, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
 
         decimal globalIncomePercent = 0;
         
-        if (currentUser.IncomePercent != null)
+        if (currentUser.User.IncomePercent != null)
         {
             var newCurrentUserIncomeEntity = new UserIncomeEntity
             {
                 IdCompany = income.IdCompany,
-                IdUser = currentUser.Id,
+                IdUser = currentUser.User.Id,
                 Income = income,
-                Amount = income.TotalAmount * currentUser.IncomePercent.Value / 100
+                Amount = income.TotalAmount * currentUser.User.IncomePercent.Value / 100
             };
 
-            globalIncomePercent += currentUser.IncomePercent.Value;
+            globalIncomePercent += currentUser.User.IncomePercent.Value;
             
             await AccounteeContext.UserIncomes.AddAsync(newCurrentUserIncomeEntity, cancellationToken);
         }
@@ -336,10 +332,11 @@ public class IncomePublicService : IIncomePublicService
         {
             if (globalIncomePercent > 100)
             {
-                throw new AccounteeException();
+                throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                    nameof(Resources.PercentMax), globalIncomePercent));
             }
             
-            if (request.Id == currentUser.Id)
+            if (request.Id == currentUser.User.Id)
             {
                 continue;
             }

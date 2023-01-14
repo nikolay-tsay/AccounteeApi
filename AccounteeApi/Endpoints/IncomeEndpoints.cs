@@ -1,4 +1,5 @@
-﻿using AccounteeDomain.Models;
+﻿using AccounteeApi.Filters;
+using AccounteeDomain.Models;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using AccounteeService.Contracts.Models;
@@ -26,6 +27,7 @@ public static class IncomeEndpoints
 
         app.MapPost("Income", CreateIncome)
             .RequireAuthorization()
+            .AddEndpointFilter<ValidationFilter<CreateIncomeRequest>>()
             .Produces<bool>();
         
         app.MapPut("Income/{incomeId}", EditIncome)
@@ -47,11 +49,12 @@ public static class IncomeEndpoints
     
     private static async Task<IResult> GetIncomes(
         IIncomePublicService service,
+        [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetIncomes(orderFilter, pageFilter, cancellationToken);
+        var result = await service.GetIncomes(searchValue, orderFilter, pageFilter, cancellationToken);
 
         return Results.Ok(result);
     }
@@ -59,11 +62,12 @@ public static class IncomeEndpoints
     private static async Task<IResult> GetUserIncomes(
         IIncomePublicService service,
         int? userId, 
+        [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetUserIncomes(userId, orderFilter, pageFilter, cancellationToken);
+        var result = await service.GetUserIncomes(userId, searchValue, orderFilter, pageFilter, cancellationToken);
 
         return Results.Ok(result);
     }

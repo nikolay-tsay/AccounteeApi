@@ -1,5 +1,7 @@
-﻿using AccounteeCommon.Enums;
+﻿using System.Globalization;
+using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
@@ -29,12 +31,13 @@ public class UserPublicService : IUserPublicService
         PasswordHandler = passwordHandler;
     }
     
-    public async Task<PagedList<UserDto>> GetUsers(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
+    public async Task<PagedList<UserDto>> GetUsers(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadUsers, cancellationToken);
         
         var users = await AccounteeContext.Users
             .AsNoTracking()
+            .ApplySearch(searchValue)
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
         
@@ -58,8 +61,8 @@ public class UserPublicService : IUserPublicService
 
     public async Task<UserDto> RegisterUser(RegistrationRequest request, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanRegisterUsers);
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanRegisterUsers);
         
         var exists = await AccounteeContext.Users
             .Where(x => x.Login == request.Login)
@@ -67,15 +70,17 @@ public class UserPublicService : IUserPublicService
 
         if (exists)
         {
-            throw new AccounteeException("User already exists");
+            throw new AccounteeException(ResourceRetriever.Get(CultureInfo.CurrentCulture,
+                nameof(Resources.AlreadyExists), nameof(UserEntity)));
         }
         
         PasswordHandler.CreateHash(request.Password, out string hash, out string salt);
         var newUser = new UserEntity
         {
-            IdCompany = currentUser.IdCompany,
+            IdCompany = currentUser.User.IdCompany,
             IdRole = request.IdRole,
             Login = request.Login,
+            UserLanguage = request.Language,
             PasswordHash = hash,
             PasswordSalt = salt,
             FirstName = request.FirstName,
@@ -115,11 +120,11 @@ public class UserPublicService : IUserPublicService
 
     public async Task<bool> DeleteUser(int userId, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanDeleteUsers);
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanDeleteUsers);
         
         var user = await AccounteeContext.Users
-            .Where(x => x.Id != currentUser.Id)
+            .Where(x => x.Id != currentUser.User.Id)
             .Where(x => x.Id == userId)
             .FirstOrNotFound(cancellationToken);
 

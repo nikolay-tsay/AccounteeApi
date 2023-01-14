@@ -1,14 +1,18 @@
 ﻿using System.Text;
 using AccounteeApi.Endpoints;
 using AccounteeApi.Middleware;
+using AccounteeApi.Validation;
 using AccounteeCommon.HttpContexts;
 using AccounteeCommon.Options;
 using AccounteeDomain.Contexts;
+using AccounteeDomain.Models;
+using AccounteeService.Contracts.Requests;
 using AccounteeService.Mapping;
 using AccounteeService.PrivateServices;
 using AccounteeService.PrivateServices.Interfaces;
 using AccounteeService.PublicServices;
 using AccounteeService.PublicServices.Interfaces;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +20,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using JsonConverter = Newtonsoft.Json.JsonConverter;
 
 namespace AccounteeApi.Extensions;
 
@@ -30,6 +35,17 @@ public static class StartupExtension
             options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
         });
+        
+        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            Converters = new List<JsonConverter>
+            {
+                new StringEnumConverter(new CamelCaseNamingStrategy()),
+            },
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+        };
         
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(x =>
@@ -86,17 +102,6 @@ public static class StartupExtension
                 x => x.MigrationsAssembly("AccounteeApi"));
         });
 
-        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Converters = new List<JsonConverter>
-            {
-                new StringEnumConverter(new CamelCaseNamingStrategy()),
-            },
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc
-        };
-
         builder.Services.AddSwaggerGenNewtonsoftSupport();
         
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)    
@@ -152,6 +157,8 @@ public static class StartupExtension
         var accessor = new HttpContextAccessor();
         builder.Services.AddSingleton<IHttpContextAccessor>(accessor);
         GlobalHttpContext.HttpContextAccessor = accessor;
+
+        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         
         builder.Services.AddScoped<IAuthPrivateService, AuthPrivateService>();
         builder.Services.AddScoped<IPasswordHandler, PasswordHandler>();

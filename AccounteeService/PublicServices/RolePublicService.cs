@@ -1,6 +1,7 @@
 ﻿using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
 using AccounteeCommon.HttpContexts;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
@@ -27,12 +28,13 @@ public class RolePublicService : IRolePublicService
         Mapper = mapper;
     }
 
-    public async Task<PagedList<RoleDto>> GetRoles(OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
+    public async Task<PagedList<RoleDto>> GetRoles(string? searchValue, OrderFilter orderFilter, PageFilter pageFilter, CancellationToken cancellationToken)
     {
         await CurrentUserPrivateService.CheckCurrentUserRights(UserRights.CanReadRoles, cancellationToken);
 
         var roles = await AccounteeContext.Roles
             .AsNoTracking()
+            .ApplySearch(searchValue)
             .FilterOrder(orderFilter)
             .ToPagedList(pageFilter, cancellationToken);
         
@@ -56,18 +58,14 @@ public class RolePublicService : IRolePublicService
 
     public async Task<RoleDto> CreateRole(RoleDto model, CancellationToken cancellationToken)
     {
-        var currentUser = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        CurrentUserPrivateService.CheckUserRights(currentUser, UserRights.CanCreateRoles);
-
-        if (string.IsNullOrWhiteSpace(model.Name))
-        {
-            throw new AccounteeException();
-        }
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanCreateRoles);
 
         var newRole = Mapper.Map<RoleEntity>(model);
         if (newRole == null)
         {
-            throw new AccounteeException();
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                nameof(Resources.MappingError), new object[] {nameof(RoleDto), nameof(RoleEntity)}));
         }
 
         newRole.IdCompany = GlobalHttpContext.GetCompanyId();

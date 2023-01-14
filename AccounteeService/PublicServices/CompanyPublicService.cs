@@ -1,14 +1,13 @@
 ﻿using AccounteeCommon.Enums;
 using AccounteeCommon.Exceptions;
 using AccounteeCommon.HttpContexts;
+using AccounteeCommon.Resources;
 using AccounteeDomain.Contexts;
 using AccounteeDomain.Entities;
 using AccounteeDomain.Models;
-using AccounteeService.Extensions;
 using AccounteeService.PrivateServices.Interfaces;
 using AccounteeService.PublicServices.Interfaces;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AccounteeService.PublicServices;
 
@@ -27,66 +26,59 @@ public class CompanyPublicService : ICompanyPublicService
 
     public async Task<CompanyDto> GetCompany(CancellationToken cancellationToken)
     {
-        var user = await CurrentUserPrivateService.GetCurrentUser(cancellationToken);
-        if (user.Company == null)
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(false, cancellationToken);
+        if (currentUser.User.Company == null)
         {
-            throw new AccounteeNotFoundException();
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                nameof(Resources.UserNoCompany), currentUser.User.Login));
         }
 
-        var mapped = Mapper.Map<CompanyDto>(user.Company);
+        var mapped = Mapper.Map<CompanyDto>(currentUser.User.Company);
         return mapped;
     }
 
     public async Task<CompanyDto> CreateCompany(CompanyDto model, CancellationToken cancellationToken)
     {
         GlobalHttpContext.SetIgnoreCompanyFilter(true);
-        
-        var userId = CurrentUserPrivateService.GetCurrentUserId();
-        var user = await AccounteeContext.Users
-            .Include(x => x.Role)
-            .Where(x => x.Id == userId)
-            .FirstOrNotFound(cancellationToken);
-        
-        CurrentUserPrivateService.CheckUserRights(user, UserRights.CanCreateCompany);
-        ValidateCreateRequest(model);
+
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(true, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanCreateCompany);
+
         var newCompany = new CompanyEntity
         {
             Name = model.Name!,
-            Email = model.Email,
+            Email = model.Email ?? currentUser.User.Email,
             PhoneNumber = model.PhoneNumber,
             Budget = model.Budget ?? 0
         };
 
         await AccounteeContext.Companies.AddAsync(newCompany, cancellationToken);
         var role = await CreateOwnerRole(newCompany, cancellationToken);
-        user.Role = role;
-        user.Company = newCompany;
+        currentUser.User.Role = role;
+        currentUser.User.Company = newCompany;
         
         await AccounteeContext.SaveChangesAsync(cancellationToken);
 
         var mapped = Mapper.Map<CompanyDto>(newCompany);
 
+        GlobalHttpContext.SetCompanyId(newCompany.Id);
         GlobalHttpContext.SetIgnoreCompanyFilter(false);
         return mapped;
     }
 
     public async Task<bool> DeleteCompany(CancellationToken cancellationToken)
     {
-        var userId = CurrentUserPrivateService.GetCurrentUserId();
-        var user = await AccounteeContext.Users
-            .Include(x => x.Role)
-            .Include(x => x.Company)
-            .Where(x => x.Id == userId)
-            .FirstOrNotFound(cancellationToken);
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(true, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanDeleteCompany);
         
-        CurrentUserPrivateService.CheckUserRights(user, UserRights.CanDeleteCompany);
-        if (user.Company == null)
+        if (currentUser.User.Company == null)
         {
-            throw new AccounteeException();
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                nameof(Resources.UserNoCompany), currentUser.User.Login));
         }
 
-        user.IdRole = 1;
-        AccounteeContext.Companies.Remove(user.Company);
+        currentUser.User.IdRole = 1;
+        AccounteeContext.Companies.Remove(currentUser.User.Company);
 
         await AccounteeContext.SaveChangesAsync(cancellationToken);
         
@@ -95,47 +87,39 @@ public class CompanyPublicService : ICompanyPublicService
 
     public async Task<CompanyDto> EditCompany(CompanyDto model, CancellationToken cancellationToken)
     {
-        var userId = CurrentUserPrivateService.GetCurrentUserId();
-        var user = await AccounteeContext.Users
-            .Include(x => x.Role)
-            .Include(x => x.Company)
-            .Where(x => x.Id == userId)
-            .FirstOrNotFound(cancellationToken);
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(true, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanEditCompany);
         
-        CurrentUserPrivateService.CheckUserRights(user, UserRights.CanEditCompany);
-        if (user.Company == null)
+        if (currentUser.User.Company == null)
         {
-            throw new AccounteeException();
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                nameof(Resources.UserNoCompany), currentUser.User.Login));
         }
 
-        user.Company.Email = model.Email ?? user.Company.Email;
-        user.Company.PhoneNumber = model.PhoneNumber ?? user.Company.PhoneNumber;
-        user.Company.Name = model.Name ?? user.Company.Name;
+        currentUser.User.Company.Email = model.Email ?? currentUser.User.Company.Email;
+        currentUser.User.Company.PhoneNumber = model.PhoneNumber ?? currentUser.User.Company.PhoneNumber;
+        currentUser.User.Company.Name = model.Name ?? currentUser.User.Company.Name;
 
         await AccounteeContext.SaveChangesAsync(cancellationToken);
-        var mapped = Mapper.Map<CompanyDto>(user.Company);
+        var mapped = Mapper.Map<CompanyDto>(currentUser.User.Company);
         
         return mapped;
     }
 
     public async Task<CompanyDto> EditBudget(decimal value, CancellationToken cancellationToken)
     {
-        var userId = CurrentUserPrivateService.GetCurrentUserId();
-        var user = await AccounteeContext.Users
-            .Include(x => x.Role)
-            .Include(x => x.Company)
-            .Where(x => x.Id == userId)
-            .FirstOrNotFound(cancellationToken);
+        var currentUser = await CurrentUserPrivateService.GetCurrentUser(true, cancellationToken);
+        CurrentUserPrivateService.CheckUserRights(currentUser.User, UserRights.CanEditCompany);
         
-        CurrentUserPrivateService.CheckUserRights(user, UserRights.CanEditCompany);
-        if (user.Company == null)
+        if (currentUser.User.Company == null)
         {
-            throw new AccounteeException();
+            throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
+                nameof(Resources.UserNoCompany), currentUser.User.Login));
         }
         
-        user.Company.Budget = value;
+        currentUser.User.Company.Budget = value;
         await AccounteeContext.SaveChangesAsync(cancellationToken);
-        var mapped = Mapper.Map<CompanyDto>(user.Company);
+        var mapped = Mapper.Map<CompanyDto>(currentUser.User.Company);
         
         return mapped;
     }
@@ -151,13 +135,5 @@ public class CompanyPublicService : ICompanyPublicService
 
         await AccounteeContext.Roles.AddAsync(newRole, cancellationToken);
         return newRole;
-    }
-
-    private void ValidateCreateRequest(CompanyDto model)
-    {
-        if (string.IsNullOrWhiteSpace(model.Name))
-        {
-            throw new AccounteeException("Company must have a name");
-        }
     }
 }

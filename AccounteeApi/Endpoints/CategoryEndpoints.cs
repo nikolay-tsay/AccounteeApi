@@ -1,4 +1,5 @@
-﻿using AccounteeDomain.Entities.Enums;
+﻿using AccounteeApi.Filters;
+using AccounteeDomain.Entities.Enums;
 using AccounteeDomain.Models;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
@@ -17,6 +18,7 @@ public static class CategoryEndpoints
 
         app.MapPost("Category", CreateCategory)
             .RequireAuthorization()
+            .AddEndpointFilter<ValidationFilter<CategoryDto>>()
             .Produces<CategoryDto>();
         
         app.MapPut("Category/{id}", EditCategory)
@@ -30,12 +32,13 @@ public static class CategoryEndpoints
     
     private static async Task<IResult> GetCategories(
         ICategoryPublicService service,
+        [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter, 
         [AsParameters] CategoryTargets target,
         CancellationToken cancellationToken)
     {
-        var result = await service.GetCategories(orderFilter, pageFilter, target, cancellationToken);
+        var result = await service.GetCategories(searchValue, orderFilter, pageFilter, target, cancellationToken);
 
         return Results.Ok(result);
     }

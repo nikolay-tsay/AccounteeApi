@@ -38,11 +38,12 @@ public static class UserEndpoints
     
     private static async Task<IResult> GetUsers(
         IUserPublicService service,
+        [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter, 
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetUsers(orderFilter, pageFilter, cancellationToken);
+        var result = await service.GetUsers(searchValue, orderFilter, pageFilter, cancellationToken);
 
         return Results.Ok(result);
     }
