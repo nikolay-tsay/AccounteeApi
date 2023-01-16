@@ -1,8 +1,8 @@
-﻿using AccounteeDomain.Models;
+﻿using AccounteeCQRS.Requests.User;
+using AccounteeCQRS.Responses;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
-using AccounteeService.Contracts.Requests;
-using AccounteeService.PublicServices.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -11,91 +11,97 @@ public static class UserEndpoints
 {
     public static void MapUserEndpoints(this WebApplication app)
     {
-        app.MapGet("User", GetUsers)
-            .RequireAuthorization()
-            .Produces<PagedList<UserDto>>();
+        app.MapGroup("user")
+            .MapEndpoints()
+            .RequireAuthorization();
+    }
 
-        app.MapGet("User/{userId}", GetUserById)
-            .RequireAuthorization()
-            .Produces<UserDto>();
+    private static RouteGroupBuilder MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/", GetUsers)
+            .Produces<PagedList<UserResponse>>();
 
-        app.MapPost("User", RegisterUser)
-            .RequireAuthorization()
-            .Produces<UserDto>();
+        group.MapGet("/{userId}", GetUserById)
+            .Produces<UserResponse>();
 
-        app.MapPut("User/{userId}", EditUser)
-            .RequireAuthorization()
-            .Produces<UserDto>();
+        group.MapPost("/", RegisterUser)
+            .Produces<UserResponse>();
 
-        app.MapDelete("User/{userId}", DeleteUser)
-            .RequireAuthorization()
+        group.MapPut("/", EditUser)
+            .Produces<UserResponse>();
+
+        group.MapPut("/{userId}/role/{roleId}", ChangeUserRole)
+            .Produces<UserResponse>();
+        
+        group.MapDelete("/{userId}", DeleteUser)
             .Produces<bool>();
 
-        app.MapPut("User/{userId}/Role/{roleId}", ChangeUserRole)
-            .RequireAuthorization()
-            .Produces<UserDto>();
+        return group;
     }
     
     private static async Task<IResult> GetUsers(
-        IUserPublicService service,
+        IMediator mediator,
         [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter, 
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetUsers(searchValue, orderFilter, pageFilter, cancellationToken);
+        var query = new GetUsersQuery(searchValue, orderFilter, pageFilter);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> GetUserById(
-        IUserPublicService service,
+        IMediator mediator,
         int userId, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetUserById(userId, cancellationToken);
+        var query = new GetUserByIdQuery(userId);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> RegisterUser(       
-        IUserPublicService service,
-        [FromBody] RegistrationRequest request,
+        IMediator mediator,
+        [FromBody] RegisterUserCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.RegisterUser(request, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> EditUser(        
-        IUserPublicService service,
-        int userId,
-        [FromBody] UserDto model, 
+        IMediator mediator,
+        [FromBody] EditUserCommand comand, 
         CancellationToken cancellationToken)
     {
-        var result = await service.EditUser(userId, model, cancellationToken);
+        var result = await mediator.Send(comand, cancellationToken);
+
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> ChangeUserRole(    
+        IMediator mediator,
+        int roleId,
+        int userId, 
+        CancellationToken cancellationToken)
+    {
+        var command = new ChangeUserRoleCommand(userId, roleId);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> DeleteUser(        
-        IUserPublicService service,
+        IMediator mediator,
         int userId,
         CancellationToken cancellationToken)
     {
-        var result = await service.DeleteUser(userId, cancellationToken);
-
-        return Results.Ok(result);
-    }
-    
-    private static async Task<IResult> ChangeUserRole(    
-        IUserPublicService service,
-        int roleId,
-        int userId, 
-        CancellationToken cancellationToken)
-    {
-        var result = await service.ChangeUserRole(roleId, userId, cancellationToken);
+        var command = new DeleteUserCommand(userId);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }

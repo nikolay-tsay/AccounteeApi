@@ -2,7 +2,7 @@
 
 namespace AccounteeCommon.Exceptions;
 
-public class AccounteeUnauthorizedException : AccounteeException
+public sealed class AccounteeUnauthorizedException : AccounteeException
 {
     public AccounteeUnauthorizedException(string? message = null) : base(message) { }
 

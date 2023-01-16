@@ -1,8 +1,8 @@
-﻿using AccounteeApi.Filters;
-using AccounteeDomain.Models;
+﻿using AccounteeCQRS.Requests.Service;
+using AccounteeCQRS.Responses;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
-using AccounteeService.PublicServices.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -11,92 +11,97 @@ public static class ServiceEndpoints
 {
     public static void MapServiceEndpoints(this WebApplication app)
     {
-        app.MapGet("Service", GetServices)
-            .RequireAuthorization()
-            .Produces<PagedList<ServiceDto>>();
+        app.MapGroup("service")
+            .MapEndpoints()
+            .RequireAuthorization();
+    }
+
+    private static RouteGroupBuilder MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/", GetServices)
+            .Produces<PagedList<ServiceResponse>>();
         
-        app.MapGet("Service/{serviceId}", GetServiceById)
-            .RequireAuthorization()
-            .Produces<ServiceDto>();
+        group.MapGet("/{serviceId}", GetServiceById)
+            .Produces<ServiceResponse>();
 
-        app.MapPost("Service", CreateService)
-            .RequireAuthorization()
-            .AddEndpointFilter<ValidationFilter<ServiceDto>>()
-            .Produces<ServiceDto>();
+        group.MapPost("/", CreateService)
+            .Produces<ServiceResponse>();
 
-        app.MapPut("Service/{serviceId}", EditService)
-            .RequireAuthorization()
-            .Produces<ServiceDto>();
+        group.MapPut("/", EditService)
+            .Produces<ServiceResponse>();
 
-        app.MapPut("Service/{serviceId}/Category/{categoryId}", ChangeServiceCategory)
-            .RequireAuthorization()
-            .Produces<ServiceDto>();
+        group.MapPut("/{serviceId}/category/{categoryId}", ChangeServiceCategory)
+            .Produces<ServiceResponse>();
 
-        app.MapDelete("Service/{serviceId}", DeleteService)
-            .RequireAuthorization()
+        group.MapDelete("/{serviceId}", DeleteService)
             .Produces<bool>();
+
+        return group;
     }
 
     private static async Task<IResult> GetServices(
-        IServicePublicService service,
+        IMediator mediator,
         [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter,
         CancellationToken cancellationToken)
     {
-        var result = await service.GetServices(searchValue, orderFilter, pageFilter, cancellationToken);
+        var query = new GetServicesQuery(searchValue, orderFilter, pageFilter);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
 
     private static async Task<IResult> GetServiceById(
-        IServicePublicService service,
+        IMediator mediator,
         int serviceId,
         CancellationToken cancellationToken)
     {
-        var result = await service.GetServiceById(serviceId, cancellationToken);
+        var query = new GetServiceByIdQuery(serviceId);
+        var result = await mediator.Send(query, cancellationToken);
         
         return Results.Ok(result);
     }
 
     private static async Task<IResult> CreateService(
-        IServicePublicService service,
-        [FromBody] ServiceDto model,
+        IMediator mediator,
+        [FromBody] CreateServiceCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.CreateService(model, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
         
         return Results.Ok(result);
     }
 
     private static async Task<IResult> EditService(
-        IServicePublicService service,
-        int serviceId,
-        [FromBody] ServiceDto model,
+        IMediator mediator,
+        [FromBody] EditServiceCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.EditService(serviceId, model, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
         
         return Results.Ok(result);
     }
 
     private static async Task<IResult> ChangeServiceCategory(
-        IServicePublicService service,
+        IMediator mediator,
         int serviceId,
         int categoryId,
         CancellationToken cancellationToken)
     {
-        var result = await service.ChangeServiceCategory(serviceId, categoryId, cancellationToken);
+        var command = new ChangeServiceCategoryCommand(serviceId, categoryId);
+        var result = await mediator.Send(command, cancellationToken);
         
         return Results.Ok(result);
     }
 
     private static async Task<IResult> DeleteService(
-        IServicePublicService service,
+        IMediator mediator,
         int serviceId,
         CancellationToken cancellationToken)
     {
-        var result = await service.DeleteService(serviceId, cancellationToken);
+        var command = new DeleteServiceCommand(serviceId);
+        var result = await mediator.Send(command, cancellationToken);
         
         return Results.Ok(result);
     }

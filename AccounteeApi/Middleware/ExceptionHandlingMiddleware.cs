@@ -29,7 +29,7 @@ public class ExceptionHandlingMiddleware
     {
         if (httpContext.Response.HasStarted)
         {
-            Logger.LogWarning("The response has already started, the http status code middleware will not be executed.");
+            Logger.LogWarning("The response has already started, the http status code middleware will not be executed");
             throw ex;
         }
 

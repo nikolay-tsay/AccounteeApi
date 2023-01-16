@@ -6,21 +6,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AccounteeDomain.Contexts;
 
-public class AccounteeContext : DbContext
+public sealed class AccounteeContext : DbContext
 {
-    public DbSet<UserEntity> Users { get; set; } = null!;
-    public DbSet<CompanyEntity> Companies { get; set; } = null!;
-    public DbSet<RoleEntity> Roles { get; set; } = null!;
-    public DbSet<IncomeEntity> Incomes { get; set; } = null!;
-    public DbSet<OutcomeEntity> Outcomes { get; set; } = null!;
-    public DbSet<ServiceEntity> Services { get; set; } = null!;
-    public DbSet<ProductEntity> Products { get; set; } = null!;
-    public DbSet<ServiceProductEntity> ServiceProducts { get; set; } = null!;
-    public DbSet<UserIncomeEntity> UserIncomes { get; set; } = null!;
-    public DbSet<UserServiceEntity> UserServices { get; set; } = null!;
-    public DbSet<IncomeProductEntity> IncomeProducts { get; set; } = null!;
-    public DbSet<OutcomeProductEntity> OutcomeProducts { get; set; } = null!;
-    public DbSet<CategoryEntity> Categories { get; set; } = null!;
+    public required DbSet<UserEntity> Users { get; set; }
+    public required DbSet<CompanyEntity> Companies { get; set; }
+    public required DbSet<RoleEntity> Roles { get; set; }
+    public required DbSet<IncomeEntity> Incomes { get; set; }
+    public required DbSet<OutcomeEntity> Outcomes { get; set; }
+    public required DbSet<ServiceEntity> Services { get; set; }
+    public required DbSet<ProductEntity> Products { get; set; }
+    public required DbSet<ServiceProductEntity> ServiceProducts { get; set; }
+    public required DbSet<UserIncomeEntity> UserIncomes { get; set; }
+    public required DbSet<UserServiceEntity> UserServices { get; set; }
+    public required DbSet<IncomeProductEntity> IncomeProducts { get; set; }
+    public required DbSet<OutcomeProductEntity> OutcomeProducts { get; set; }
+    public required DbSet<CategoryEntity> Categories { get; set; }
 
     public AccounteeContext(DbContextOptions<AccounteeContext> options) : base(options) { }
 

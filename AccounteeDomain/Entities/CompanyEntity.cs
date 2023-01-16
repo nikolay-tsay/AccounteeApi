@@ -9,14 +9,13 @@ public class CompanyEntity
     public int Id { get; set; }
     
     [MaxLength(30)]
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
     
     [MaxLength(50)]
     public string? Email { get; set; }
     
     [MaxLength(20)]
     public string? PhoneNumber { get; set; }
-
     public decimal Budget { get; set; }
 
     public IEnumerable<UserEntity> UserList { get; set; } = null!;

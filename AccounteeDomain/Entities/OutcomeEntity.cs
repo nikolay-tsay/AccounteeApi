@@ -11,7 +11,7 @@ public class OutcomeEntity : IBaseWithCompany, ISearchable
     public int? IdCompany { get; set; }
     public int IdCategory { get; set; }
 
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
     public string? Description { get; set; }
     public DateTime DateTime { get; set; }
     public DateTime LastEdited { get; set; }

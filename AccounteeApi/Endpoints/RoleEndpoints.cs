@@ -1,8 +1,8 @@
-﻿using AccounteeApi.Filters;
-using AccounteeDomain.Models;
+﻿using AccounteeCQRS.Requests.Role;
+using AccounteeCQRS.Responses;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
-using AccounteeService.PublicServices.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -11,77 +11,82 @@ public static class RoleEndpoints
 {
     public static void MapRoleEndpoints(this WebApplication app)
     {
-        app.MapGet("Role", GetRoles)
-            .RequireAuthorization()
-            .Produces<PagedList<RoleDto>>();
+        app.MapGroup("role")
+            .MapEndpoints()
+            .RequireAuthorization();
+    }
+
+    private static RouteGroupBuilder MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/", GetRoles)
+            .Produces<PagedList<RoleResponse>>();
         
-        app.MapGet("Role/{roleId}", GetRoleById)
-            .RequireAuthorization()
-            .Produces<RoleDto>();
+        group.MapGet("/{roleId}", GetRoleById)
+            .Produces<RoleResponse>();
 
-        app.MapPost("Role", CreateRole)
-            .RequireAuthorization()
-            .AddEndpointFilter<ValidationFilter<RoleDto>>()
-            .Produces<RoleDto>();
+        group.MapPost("/", CreateRole)
+            .Produces<RoleResponse>();
 
-        app.MapPut("Role/{roleId}", EditRole)
-            .RequireAuthorization()
-            .Produces<RoleDto>();
+        group.MapPut("/", EditRole)
+            .Produces<RoleResponse>();
 
-        app.MapDelete("Role/{roleId}", DeleteRole)
-            .RequireAuthorization()
+        group.MapDelete("/{roleId}", DeleteRole)
             .Produces<bool>();
+
+        return group;
     }
     
     private static async Task<IResult> GetRoles(
-        IRolePublicService service,
+        IMediator mediator,
         [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter, 
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetRoles(searchValue, orderFilter, pageFilter, cancellationToken);
+        var query = new GetRolesQuery(searchValue, orderFilter, pageFilter);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> GetRoleById(
-        IRolePublicService service,
+        IMediator mediator,
         int roleId, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetRoleById(roleId, cancellationToken);
+        var query = new GetRoleByIdQuery(roleId);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
 
     private static async Task<IResult> CreateRole(
-        IRolePublicService service,
-        [FromBody] RoleDto model,
+        IMediator mediator,
+        [FromBody] CreateRoleCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.CreateRole(model, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> EditRole(
-        IRolePublicService service,
-        int roleId, 
-        [FromBody] RoleDto model,
+        IMediator mediator,
+        [FromBody] EditRoleCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.EditRole(roleId, model, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
-    private static async Task<IResult> DeleteRole(       
-        IRolePublicService service,
+    private static async Task<IResult> DeleteRole(
+        IMediator mediator,
         int roleId, 
         CancellationToken cancellationToken)
     {
-        var result = await service.DeleteRole(roleId, cancellationToken);
+        var query = new DeleteRoleCommand(roleId);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }

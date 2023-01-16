@@ -2,9 +2,9 @@
 
 public class ErrorResponse
 {
-    public IEnumerable<string> ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; }
 
-    public ErrorResponse(IEnumerable<string> errorMessage)
+    public ErrorResponse(string errorMessage)
     {
         ErrorMessage = errorMessage;
     }

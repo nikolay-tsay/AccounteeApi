@@ -11,7 +11,7 @@ public class UserIncomeEntity : IBaseWithCompany
     public int IdUser { get; set; }
     public int IdIncome { get; set; }
     
-    public decimal Amount { get; set; }
+    public required decimal Amount { get; set; }
 
     public CompanyEntity? Company { get; set; }
     public UserEntity User { get; set; } = null!;

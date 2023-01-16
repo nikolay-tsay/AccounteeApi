@@ -1,18 +1,16 @@
 ﻿using System.Text;
 using AccounteeApi.Endpoints;
 using AccounteeApi.Middleware;
-using AccounteeApi.Validation;
 using AccounteeCommon.HttpContexts;
 using AccounteeCommon.Options;
+using AccounteeCQRS;
+using AccounteeCQRS.Mapping;
 using AccounteeDomain.Contexts;
-using AccounteeDomain.Models;
-using AccounteeService.Contracts.Requests;
-using AccounteeService.Mapping;
-using AccounteeService.PrivateServices;
-using AccounteeService.PrivateServices.Interfaces;
-using AccounteeService.PublicServices;
-using AccounteeService.PublicServices.Interfaces;
-using FluentValidation;
+using AccounteeService.Repositories;
+using AccounteeService.Repositories.Interfaces;
+using AccounteeService.Services;
+using AccounteeService.Services.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -85,7 +83,7 @@ public static class StartupExtension
                 }
             });
         });
-        builder.Services.AddAutoMapper(typeof(EntityToModelProfile), typeof(ModelToEntityProfile));
+        builder.Services.AddAutoMapper(typeof(EntityToResponseProfile), typeof(RequestToEntityProfile));
 
         var jwtOptions = new JwtOptions();
         var pwdOptions = new PwdOptions();
@@ -118,6 +116,8 @@ public static class StartupExtension
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))    
                 };    
             });
+
+        builder.Services.AddMediatR(typeof(MediatorAssemblyReference));
 
         builder.AddServices();
     }
@@ -158,19 +158,16 @@ public static class StartupExtension
         builder.Services.AddSingleton<IHttpContextAccessor>(accessor);
         GlobalHttpContext.HttpContextAccessor = accessor;
 
-        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-        
-        builder.Services.AddScoped<IAuthPrivateService, AuthPrivateService>();
+        builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddScoped<IPasswordHandler, PasswordHandler>();
-        builder.Services.AddScoped<ICurrentUserPrivateService, CurrentUserPrivateService>();
-        
-        builder.Services.AddScoped<IAuthPublicService, AuthPublicService>();
-        builder.Services.AddScoped<ICompanyPublicService, CompanyPublicService>();
-        builder.Services.AddScoped<IUserPublicService, UserPublicService>();
-        builder.Services.AddScoped<IProductPublicService, ProductPublicService>();
-        builder.Services.AddScoped<IRolePublicService, RolePublicService>();
-        builder.Services.AddScoped<IIncomePublicService, IncomePublicService>();
-        builder.Services.AddScoped<ICategoryPublicService, CategoryPublicService>();
-        builder.Services.AddScoped<IServicePublicService, ServicePublicService>();
+        builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+        builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+        builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+        builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
     }
 }

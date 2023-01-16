@@ -2,7 +2,7 @@
 
 namespace AccounteeCommon.Exceptions;
 
-public class AccounteeUnreachableException : AccounteeException
+public sealed class AccounteeUnreachableException : AccounteeException
 {
     public AccounteeUnreachableException(string? message = null) : base(message){ }
 

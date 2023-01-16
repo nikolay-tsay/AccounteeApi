@@ -13,15 +13,14 @@ public class ServiceEntity : IBaseWithCompany, ISearchable
     public int IdCategory { get; set; }
 
     [MaxLength(50)]
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
     
     [MaxLength(250)]
     public string? Description { get; set; }
-    public decimal TotalPrice { get; set; }
+    public required decimal TotalPrice { get; set; }
 
     public string SearchValue => Name.ToLower();
 
-    
     public CompanyEntity? Company { get; set; }
     public CategoryEntity ServiceCategory { get; set; } = null!;
     public IEnumerable<UserServiceEntity>? UserServiceList { get; set; }

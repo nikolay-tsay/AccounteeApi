@@ -42,4 +42,7 @@
     <data name="PercentMax" xml:space="preserve">
         <value>{0} is more than max value - 100</value>
     </data>
+    <data name="CannotDeleteSelf" xml:space="preserve">
+        <value>You can't delete yourself</value>
+    </data>
 </root>

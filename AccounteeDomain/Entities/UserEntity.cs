@@ -14,22 +14,22 @@ public class UserEntity : IBaseWithCompany, ISearchable
     public UserLanguages UserLanguage { get; set; }
 
     [MaxLength(25)]
-    public string Login { get; set; } = null!;
+    public required string Login { get; set; }
     
     [MaxLength(50)]
-    public string PasswordHash { get; set; } = null!;
+    public required string PasswordHash { get; set; }
     
     [MaxLength(50)]
-    public string PasswordSalt { get; set; } = null!;
+    public required string PasswordSalt { get; set; }
     
     [MaxLength(25)]
-    public string FirstName { get; set; } = null!;
+    public required string FirstName { get; set; }
     
     [MaxLength(25)]
-    public string LastName { get; set; } = null!;
+    public required string LastName { get; set; }
     
     [MaxLength(50)]
-    public string Email { get; set; } = null!;
+    public required string Email { get; set; }
     
     [MaxLength(20)]
     public string? PhoneNumber { get; set; }
@@ -39,7 +39,6 @@ public class UserEntity : IBaseWithCompany, ISearchable
 
     public CompanyEntity? Company { get; set; }
     public RoleEntity Role { get; set; } = null!;
-    
     public IEnumerable<UserIncomeEntity>? UserIncomeList { get; set; }
     public IEnumerable<UserServiceEntity>? UserServiceList { get; set; }
 }
