@@ -9,10 +9,10 @@ public class CategoryEntity : IBaseWithCompany, ISearchable
     [Key]
     public int Id { get; set; }
     public int? IdCompany { get; set; }
-    public CategoryTargets Target { get; set; }
+    public required CategoryTargets Target { get; set; }
 
     [MaxLength(50)]
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
     
     [MaxLength(250)]
     public string? Description { get; set; }

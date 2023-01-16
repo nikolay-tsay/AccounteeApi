@@ -35,4 +35,7 @@
     <data name="PercentMax" xml:space="preserve">
         <value>{0} превышает максимальную величину - 100</value>
     </data>
+    <data name="CannotDeleteSelf" xml:space="preserve">
+        <value>Вы не можете удалить себя</value>
+    </data>
 </root>

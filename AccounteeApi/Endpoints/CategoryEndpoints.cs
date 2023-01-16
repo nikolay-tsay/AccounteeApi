@@ -1,9 +1,9 @@
-﻿using AccounteeApi.Filters;
+﻿using AccounteeCQRS.Requests.Category;
+using AccounteeCQRS.Responses;
 using AccounteeDomain.Entities.Enums;
-using AccounteeDomain.Models;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
-using AccounteeService.PublicServices.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -12,66 +12,70 @@ public static class CategoryEndpoints
 {
     public static void MapCategoryEndpoints(this WebApplication app)
     {
-        app.MapGet("Category", GetCategories)
-            .RequireAuthorization()
-            .Produces<PagedList<CategoryDto>>();
+        app.MapGroup("category")
+            .MapEndpoints()
+            .RequireAuthorization();
+    }
 
-        app.MapPost("Category", CreateCategory)
-            .RequireAuthorization()
-            .AddEndpointFilter<ValidationFilter<CategoryDto>>()
-            .Produces<CategoryDto>();
+    private static RouteGroupBuilder MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/", GetCategories)
+            .Produces<PagedList<CategoryResponse>>();
+
+        group.MapPost("/", CreateCategory)
+            .Produces<CategoryResponse>();
         
-        app.MapPut("Category/{id}", EditCategory)
-            .RequireAuthorization()
-            .Produces<CategoryDto>();
+        group.MapPut("/", EditCategory)
+            .Produces<CategoryResponse>();
 
-        app.MapDelete("Category/{id}", DeleteCategory)
-            .RequireAuthorization()
+        group.MapDelete("/{id}", DeleteCategory)
             .Produces<bool>();
+
+        return group;
     }
     
     private static async Task<IResult> GetCategories(
-        ICategoryPublicService service,
+        IMediator mediator,
         [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter, 
-        [AsParameters] CategoryTargets target,
+        [FromQuery] CategoryTargets target,
         CancellationToken cancellationToken)
     {
-        var result = await service.GetCategories(searchValue, orderFilter, pageFilter, target, cancellationToken);
+        var query = new GetCategoriesQuery(searchValue, orderFilter, pageFilter, target);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
 
     private static async Task<IResult> CreateCategory(
-        ICategoryPublicService service,
-        [FromBody] CategoryDto model,
+        IMediator mediator,
+        [FromBody] CreateCategoryCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.CreateCategory(model, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
 
     private static async Task<IResult> EditCategory(
-        ICategoryPublicService service, 
-        int id, 
-        [AsParameters] CategoryTargets target,
-        [FromBody] CategoryDto model,
+        IMediator mediator, 
+        [FromBody] EditCategoryCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.EditCategory(id, model, target, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> DeleteCategory(
-        ICategoryPublicService service,
+        IMediator mediator,
         int id, 
-        [AsParameters] CategoryTargets target, 
+        [FromQuery] CategoryTargets target, 
         CancellationToken cancellationToken)
     {
-        var result = await service.DeleteCategory(target, id, cancellationToken);
+        var command = new DeleteCategoryCommand(id, target);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }

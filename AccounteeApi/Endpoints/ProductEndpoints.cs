@@ -1,8 +1,8 @@
-﻿using AccounteeApi.Filters;
-using AccounteeDomain.Models;
+﻿using AccounteeCQRS.Requests.Product;
+using AccounteeCQRS.Responses;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
-using AccounteeService.PublicServices.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -11,92 +11,98 @@ public static class ProductEndpoints
 {
     public static void MapProductEndpoints(this WebApplication app)
     {
-        app.MapGet("Product", GetProducts)
-            .RequireAuthorization()
-            .Produces<PagedList<ProductDto>>();
+        app.MapGroup("product")
+            .MapEndpoints()
+            .RequireAuthorization();
+    }
 
-        app.MapGet("Product/{productId}", GetProductById)
-            .RequireAuthorization()
-            .Produces<ProductDto>();
+    private static RouteGroupBuilder MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/", GetProducts)
+            .Produces<PagedList<ProductResponse>>();
 
-        app.MapPost("Product", CreateProduct)
-            .RequireAuthorization()
-            .AddEndpointFilter<ValidationFilter<ProductDto>>()
-            .Produces<ProductDto>();
+        group.MapGet("/{productId}", GetProductById)
+            .Produces<ProductResponse>();
 
-        app.MapPut("Product/{productId}", EditProduct)
-            .RequireAuthorization()
-            .Produces<ProductDto>();       
+        group.MapPost("/", CreateProduct)
+            .Produces<ProductResponse>();
+
+        group.MapPut("/", EditProduct)
+            .Produces<ProductResponse>();       
         
-        app.MapPut("Product/{productId}/Category/{categoryId}", ChangeProductCategory)
-            .RequireAuthorization()
-            .Produces<ProductDto>();
+        group.MapPut("/{productId}/category/{categoryId}", ChangeProductCategory)
+            .Produces<ProductResponse>();
         
-        app.MapDelete("Product/{productId}", DeleteProduct)
-            .RequireAuthorization()
+        group.MapDelete("/{productId}", DeleteProduct)
             .Produces<bool>();
+
+        return group;
     }
     
     private static async Task<IResult> GetProducts(
-        IProductPublicService service,
+        IMediator mediator,
         [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter, 
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetProducts(searchValue, orderFilter, pageFilter, cancellationToken);
+
+        var query = new GetProductsQuery(searchValue, orderFilter, pageFilter);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> GetProductById(
-        IProductPublicService service,
+        IMediator mediator,
         int productId,
         CancellationToken cancellationToken)
     {
-        var result = await service.GetProductById(productId, cancellationToken);
+        var query = new GetProductByIdQuery(productId);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> CreateProduct(
-        IProductPublicService service,
-        [FromBody] ProductDto model,
+        IMediator mediator,
+        [FromBody] CreateProductCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.CreateProduct(model, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
 
     private static async Task<IResult> EditProduct(
-        IProductPublicService service,
-        int productId, 
-        [FromBody] ProductDto model,
+        IMediator mediator,
+        [FromBody] EditProductCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.EditProduct(productId, model, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> ChangeProductCategory(
-        IProductPublicService service,
+        IMediator mediator,
         int productId, 
         int categoryId,
         CancellationToken cancellationToken)
     {
-        var result = await service.ChangeProductCategory(productId, categoryId, cancellationToken);
+        var command = new ChangeProductCategoryCommand(productId, categoryId);
+        var result = await mediator.Send(command, cancellationToken);
         
         return Results.Ok(result);
     }
     
     private static async Task<IResult> DeleteProduct(
-        IProductPublicService service,
+        IMediator mediator,
         int productId,
         CancellationToken cancellationToken)
     {
-        var result = await service.DeleteProduct(productId, cancellationToken);
+        var command = new DeleteProductCommand(productId);
+        var result = await mediator.Send(command, cancellationToken);
         
         return Results.Ok(result);
     }

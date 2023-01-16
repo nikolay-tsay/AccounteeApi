@@ -5,131 +5,144 @@ using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using Microsoft.EntityFrameworkCore;
 
-namespace AccounteeService.Extensions;
-
-public static class QueryExtension
+namespace AccounteeService.Extensions
 {
-    public static IQueryable<T> IncludeIf<T, TProperty>(this IQueryable<T> source, bool condition, Expression<Func<T, TProperty>> path) where T : class
+    public static class QueryExtension
     {
-        if (condition)
+        public static IQueryable<T> IncludeIf<T, TProperty>(this IQueryable<T> source, bool condition, Expression<Func<T, TProperty>> path) where T : class
         {
-            return source.Include(path);
-        }
-        else
-        {
-            return source;
-        }
-    }
-
-    public static async Task<T> FirstOrNotFound<T>(this IQueryable<T> query, CancellationToken cancellationToken)
-    {
-        var result = await query.FirstOrDefaultAsync(cancellationToken);
-
-        if (result == null)
-        {
-            throw new AccounteeNotFoundException();
+            if (condition)
+            {
+                return source.Include(path);
+            }
+            else
+            {
+                return source;
+            }
         }
 
-        return result;
-    }
+        public static async Task<T> FirstOrNotFound<T>(this IQueryable<T> query, CancellationToken cancellationToken)
+        {
+            var result = await query.FirstOrDefaultAsync(cancellationToken);
+
+            if (result is null)
+            {
+                throw new AccounteeNotFoundException();
+            }
+
+            return result;
+        }
     
-    public static T FirstOrNotFound<T>(this IEnumerable<T> query, Func<T, bool> predicate)
-    {
-        var result = query.FirstOrDefault(predicate);
-
-        if (result == null)
+        public static T FirstOrNotFound<T>(this IEnumerable<T> query, Func<T, bool> predicate)
         {
-            throw new AccounteeNotFoundException();
-        }
+            var result = query.FirstOrDefault(predicate);
 
-        return result;
-    }
+            if (result is null)
+            {
+                throw new AccounteeNotFoundException();
+            }
+
+            return result;
+        }
     
-    public static T FirstOrNotFound<T>(this IEnumerable<T> query)
-    {
-        var result = query.FirstOrDefault();
-
-        if (result == null)
+        public static T FirstOrNotFound<T>(this IEnumerable<T> query)
         {
-            throw new AccounteeNotFoundException();
+            var result = query.FirstOrDefault();
+
+            if (result is null)
+            {
+                throw new AccounteeNotFoundException();
+            }
+
+            return result;
         }
 
-        return result;
-    }
-
-    public static IQueryable<T> TrackIf<T>(this IQueryable<T> source, bool condition) where T: class
-    {
-        if (condition)
+        public static IQueryable<T> TrackIf<T>(this IQueryable<T> source, bool condition) where T: class
         {
-            return source;
+            if (condition)
+            {
+                return source;
+            }
+
+            return source.AsNoTracking();
         }
 
-        return source.AsNoTracking();
-    }
-
-    public static IQueryable<T> ApplySearch<T>(this IQueryable<T> source, string? searchValue) where T : ISearchable
-    {
-        if (string.IsNullOrWhiteSpace(searchValue))
+        public static IQueryable<T> ApplySearch<T>(this IQueryable<T> source, string? searchValue) where T : ISearchable
         {
-            return source;
-        }
+            if (string.IsNullOrWhiteSpace(searchValue))
+            {
+                return source;
+            }
         
-        return source.Where(x => x.SearchValue.Contains(searchValue));
-    }
+            return source.Where(x => x.SearchValue.Contains(searchValue));
+        }
     
-    public static async Task<PagedList<T>> ToPagedList<T>(this IQueryable<T> source, PageFilter filter, CancellationToken cancellationToken)
-    {
-        var paged = new PagedList<T>
+        public static async Task<PagedList<T>> ToPagedList<T>(this IQueryable<T> source, PageFilter filter, CancellationToken cancellationToken)
         {
-            PageNum = filter.PageNum,
-            PageSize = filter.PageSize,
-            TotalCount = source.Count()
-        };
-        paged.TotalPages = (int) Math.Ceiling(paged.TotalCount / (double) paged.PageSize);
+            var paged = new PagedList<T>
+            {
+                PageNum = filter.PageNum,
+                PageSize = filter.PageSize,
+                TotalCount = source.Count()
+            };
+            paged.TotalPages = (int) Math.Ceiling(paged.TotalCount / (double) paged.PageSize);
         
-        paged.Items = await source
-            .Skip(paged.PageNum > 1 
-                ? paged.PageNum * paged.PageSize 
-                : 0)
-            .Take(paged.PageSize)
-            .ToListAsync(cancellationToken);
+            paged.Items = await source
+                .Skip(paged.PageNum > 1 
+                    ? paged.PageNum * paged.PageSize 
+                    : 0)
+                .Take(paged.PageSize)
+                .ToListAsync(cancellationToken);
 
-        return paged;
-    }
+            return paged;
+        }
     
-    public static IOrderedQueryable<T> FilterOrder<T>(this IQueryable<T> query, OrderFilter orderFilter)
-    {
-        if (orderFilter.PropertyName == null)
+        public static IOrderedQueryable<T> FilterOrder<T>(this IQueryable<T> query, OrderFilter orderFilter)
         {
-            return (IOrderedQueryable<T>)query;
+            if (orderFilter.OrderBy is null)
+            {
+                return (IOrderedQueryable<T>)query;
+            }
+        
+            var type = typeof(T);
+            var propInfo = type.GetProperty(orderFilter.OrderBy);
+
+            if (propInfo is null)
+            {
+                throw new AccounteeException();
+            }
+
+            var typeParams = new []
+            {
+                Expression.Parameter(type, string.Empty)
+            };
+        
+            var method = orderFilter.IsDescending == true
+                ? "OrderByDescending" 
+                : "OrderBy";
+        
+            var result = (IOrderedQueryable<T>)query.Provider.CreateQuery(
+                Expression.Call(
+                    typeof(Queryable),
+                    method,
+                    new[] { type, propInfo.PropertyType },
+                    query.Expression,
+                    Expression.Lambda(Expression.Property(typeParams[0], propInfo), typeParams))
+            );
+
+            return result;
         }
         
-        var type = typeof(T);
-        var propInfo = type.GetProperty(orderFilter.PropertyName);
-
-        if (propInfo == null)
+        public static async Task<T?> FirstAllowNull<T>(this IQueryable<T> query, bool allowNull, CancellationToken cancellationToken)
         {
-            throw new AccounteeException();
+            var result = await query.FirstOrDefaultAsync(cancellationToken);
+
+            if (result is null && !allowNull)
+            {
+                throw new AccounteeNotFoundException();
+            }
+
+            return result;
         }
-
-        var typeParams = new []
-        {
-            Expression.Parameter(type, string.Empty)
-        };
-        
-        var method = orderFilter.IsDescending == true
-            ? "OrderByDescending" 
-            : "OrderBy";
-        
-        var result = (IOrderedQueryable<T>)query.Provider.CreateQuery(
-            Expression.Call(
-                typeof(Queryable),
-                method,
-                new[] { type, propInfo.PropertyType },
-                query.Expression,
-                Expression.Lambda(Expression.Property(typeParams[0], propInfo), typeParams))
-        );
-
-        return result;
     }
 }

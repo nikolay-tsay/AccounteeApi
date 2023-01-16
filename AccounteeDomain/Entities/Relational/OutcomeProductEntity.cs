@@ -11,7 +11,7 @@ public class OutcomeProductEntity : IBaseWithCompany
     public int IdProduct { get; set; }
     public int IdOutcome { get; set; }
 
-    public decimal Amount { get; set; }
+    public required decimal Amount { get; set; }
     
     public CompanyEntity? Company { get; set; }
     public ProductEntity Product { get; set; } = null!;

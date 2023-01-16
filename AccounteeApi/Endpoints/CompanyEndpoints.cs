@@ -1,6 +1,6 @@
-﻿using AccounteeApi.Filters;
-using AccounteeDomain.Models;
-using AccounteeService.PublicServices.Interfaces;
+﻿using AccounteeCQRS.Requests.Company;
+using AccounteeCQRS.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -9,58 +9,64 @@ public static class CompanyEndpoints
 {
     public static void MapCompanyEndpoints(this WebApplication app)
     {
-        app.MapGet("Company", GetCompany)
-            .RequireAuthorization()
-            .Produces<bool>();
+        app.MapGroup("company")
+            .MapEndpoints()
+            .RequireAuthorization();
+    }
 
-        app.MapPost("Company", CreateCompany)
-            .RequireAuthorization()
-            .AddEndpointFilter<ValidationFilter<CompanyDto>>()
-            .Produces<CompanyDto>();
+    private static RouteGroupBuilder MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/", GetCompany)
+            .Produces<CompanyResponse>();
 
-        app.MapDelete("Company", DeleteCompany)
-            .RequireAuthorization()
+        group.MapPost("/", CreateCompany)
+            .Produces<CompanyResponse>();
+
+        group.MapDelete("/", DeleteCompany)
             .Produces<bool>();
         
-        app.MapPut("Company", EditCompany)
-            .RequireAuthorization()
-            .Produces<bool>();
+        group.MapPut("/", EditCompany)
+            .Produces<CompanyResponse>();
+
+        return group;
     }
     
     private static async Task<IResult> GetCompany(
-        ICompanyPublicService service,
+        IMediator mediator,
         CancellationToken cancellationToken)
     {
-        var res = await service.GetCompany(cancellationToken);
+        var query = new GetCompanyQuery();
+        var res = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(res);
     }
     
     private static async Task<IResult> CreateCompany(
-        ICompanyPublicService service, 
-        [FromBody] CompanyDto model, 
+        IMediator mediator,
+        [FromBody] CreateCompanyCommand command, 
         CancellationToken cancellationToken)
     {
-        var res = await service.CreateCompany(model, cancellationToken);
+        var res = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(res);
     }
     
     private static async Task<IResult> DeleteCompany(
-        ICompanyPublicService service,
+        IMediator mediator,
         CancellationToken cancellationToken)
     {
-        var res = await service.DeleteCompany(cancellationToken);
+        var command = new DeleteCompanyCommand();
+        var res = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(res);
     }
     
     private static async Task<IResult> EditCompany(
-        ICompanyPublicService service,
-        [FromBody] CompanyDto model,
+        IMediator mediator,
+        [FromBody] EditCompanyCommand command,
         CancellationToken cancellationToken)
     {
-        var res = await service.EditCompany(model, cancellationToken);
+        var res = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(res);
     }

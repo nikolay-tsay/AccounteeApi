@@ -1,7 +1,6 @@
-﻿using AccounteeApi.Filters;
-using AccounteeDomain.Models;
-using AccounteeService.Contracts.Requests;
-using AccounteeService.PublicServices.Interfaces;
+﻿using AccounteeCQRS.Requests.Auth;
+using AccounteeCQRS.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -10,49 +9,51 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        app.MapGet("Auth/Login", Login)
+        app.MapGroup("auth")
+            .MapEndpoints();
+    }
+
+    private static void MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("/login", Login)
             .AllowAnonymous()
             .Produces<string>();
 
-        app.MapPost("Auth/Register", Register)
+        group.MapPost("/register", Register)
             .AllowAnonymous()
-            .AddEndpointFilter<ValidationFilter<RegistrationRequest>>()
-            .Produces<UserDto>();
+            .Produces<RegisterResponse>();
 
-        app.MapPut("Auth/ChangePassword", ChangePassword)
+        group.MapPut("/changePassword", ChangePassword)
             .RequireAuthorization()
-            .Produces<UserDto>();
+            .Produces<bool>();
     }
     
     private static async Task<IResult> Login(
-        IAuthPublicService service,
-        [FromQuery] string login,
-        [FromQuery] string password,
+        IMediator mediator,
+        [AsParameters] LoginQuery query,
         CancellationToken cancellationToken)
     {
-        var result = await service.Login(login, password, cancellationToken);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
 
     private static async Task<IResult> Register(
-        IAuthPublicService service, 
-        [FromBody] RegistrationRequest request, 
+        IMediator mediator,
+        [FromBody] RegisterCommand command, 
         CancellationToken cancellationToken)
     {
-        var result = await service.Register(request, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> ChangePassword(
-        IAuthPublicService service, 
-        [FromQuery] int? userId, 
-        string oldPwd,
-        string newPwd,
+        IMediator mediator,
+        [AsParameters] ChangePasswordCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.ChangePassword(userId, oldPwd, newPwd, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }

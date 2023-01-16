@@ -3,7 +3,7 @@ using AccounteeDomain.Entities.Base;
 
 namespace AccounteeDomain.Entities.Relational;
 
-public class UserServiceEntity : IBaseWithCompany
+public sealed class UserServiceEntity : IBaseWithCompany
 {
     [Key]
     public int Id { get; set; }

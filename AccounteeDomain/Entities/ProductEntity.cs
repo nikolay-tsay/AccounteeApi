@@ -10,16 +10,16 @@ public class ProductEntity : IBaseWithCompany, ISearchable
     [Key]
     public int Id { get; set; }
 
-    public int? IdCategory { get; set; }
+    public int IdCategory { get; set; }
     public int? IdCompany { get; set; }
 
     [MaxLength(50)]
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
     [MaxLength(250)]
     public string? Description { get; set; }
-    public MeasurementUnits AmountUnit { get; set; }
-    public decimal Amount { get; set; }
-    public decimal TotalPrice { get; set; }
+    public required MeasurementUnits AmountUnit { get; set; }
+    public required decimal Amount { get; set; }
+    public required decimal TotalPrice { get; set; }
     public string SearchValue => Name.ToLower();
 
     public CategoryEntity ProductCategory { get; set; } = null!;

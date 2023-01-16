@@ -1,10 +1,9 @@
-﻿using AccounteeApi.Filters;
-using AccounteeDomain.Models;
+﻿using AccounteeCQRS.Requests.Income;
+using AccounteeCQRS.Responses.Income;
 using AccounteeService.Contracts;
 using AccounteeService.Contracts.Filters;
 using AccounteeService.Contracts.Models;
-using AccounteeService.Contracts.Requests;
-using AccounteeService.PublicServices.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccounteeApi.Endpoints;
@@ -13,124 +12,129 @@ public static class IncomeEndpoints
 {
     public static void MapIncomeEndpoints(this WebApplication app)
     {
-        app.MapGet("Income", GetIncomes)
-            .RequireAuthorization()
-            .Produces<PagedList<IncomeDto>>();
-        
-        app.MapGet("Income/User/{userId}", GetUserIncomes)
-            .RequireAuthorization()
-            .Produces<IncomeDto>();
-        
-        app.MapGet("Income/{incomeId}", GetIncomeDetails)
-            .RequireAuthorization()
-            .Produces<IncomeDetailModel>();
+        app.MapGroup("income")
+            .MapEndpoints()
+            .RequireAuthorization();
+    }
 
-        app.MapPost("Income", CreateIncome)
-            .RequireAuthorization()
-            .AddEndpointFilter<ValidationFilter<CreateIncomeRequest>>()
+    private static RouteGroupBuilder MapEndpoints(this RouteGroupBuilder group)
+    {
+        group.MapGet("", GetIncomes)
+            .Produces<PagedList<IncomeResponse>>();
+        
+        group.MapGet("/user/{userId}", GetUserIncomes)
+            .Produces<IncomeResponse>();
+        
+        group.MapGet("/{incomeId}", GetIncomeDetails)
+            .Produces<IncomeDetailResponse>();
+
+        group.MapPost("/", CreateIncome)
             .Produces<bool>();
         
-        app.MapPut("Income/{incomeId}", EditIncome)
-            .RequireAuthorization()
+        group.MapPut("/", EditIncome)
             .Produces<bool>();
         
-        app.MapDelete("Income/{incomeId}", DeleteIncome)
-            .RequireAuthorization()
+        group.MapDelete("/{incomeId}", DeleteIncome)
             .Produces<bool>();
 
-        app.MapPost("Income/{incomeId}/Product", AddProductToIncome)
-            .RequireAuthorization()
-            .Produces<IncomeDetailModel>();
+        group.MapPost("/{incomeId}/product", AddProductToIncome)
+            .Produces<IncomeDetailResponse>();
 
-        app.MapDelete("Income/{incomeId}/Product", DeleteProductFromIncome)
-            .RequireAuthorization()
-            .Produces<IncomeDetailModel>();
+        group.MapDelete("/{incomeId}/product", DeleteProductFromIncome)
+            .Produces<IncomeDetailResponse>();
+
+        return group;
     }
     
     private static async Task<IResult> GetIncomes(
-        IIncomePublicService service,
+        IMediator mediator,
         [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetIncomes(searchValue, orderFilter, pageFilter, cancellationToken);
+        var query = new GetIncomesQuery(searchValue, orderFilter, pageFilter);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> GetUserIncomes(
-        IIncomePublicService service,
-        int? userId, 
+        IMediator mediator,
+        int userId, 
         [FromQuery] string? searchValue,
         [AsParameters] OrderFilter orderFilter,
         [AsParameters] PageFilter pageFilter, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetUserIncomes(userId, searchValue, orderFilter, pageFilter, cancellationToken);
+        var query = new GetUserIncomesQuery(userId, searchValue, orderFilter, pageFilter);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> GetIncomeDetails(
-        IIncomePublicService service,
+        IMediator mediator,
         int incomeId, 
         CancellationToken cancellationToken)
     {
-        var result = await service.GetIncomeDetails(incomeId, cancellationToken);
+        var query = new GetIncomeDetailQuery(incomeId);
+        var result = await mediator.Send(query, cancellationToken);
 
         return Results.Ok(result);
     }
 
     private static async Task<IResult> CreateIncome(
-        IIncomePublicService service,
-        [FromBody] CreateIncomeRequest request,
+        IMediator mediator,
+        [FromBody] CreateIncomeCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.CreateIncome(request, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> EditIncome(
-        IIncomePublicService service,
-        [FromBody] IncomeDto model, 
-        int incomeId,
+        IMediator mediator,
+        [FromBody] EditIncomeCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await service.EditIncome(model, incomeId, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> DeleteIncome(
-        IIncomePublicService service,
+        IMediator mediator,
         int incomeId,
         CancellationToken cancellationToken)
     {
-        var result = await service.DeleteIncome(incomeId, cancellationToken);
+        var command = new DeleteIncomeCommand(incomeId);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> AddProductToIncome(
-        IIncomePublicService service,
+        IMediator mediator,
         int incomeId, 
-        [FromBody] IEnumerable<ProductToIncomeRequest> requests,
+        [FromBody] IEnumerable<ProductToIncomeModel> requests,
         CancellationToken cancellationToken)
     {
-        var result = await service.AddProductToIncome(incomeId, requests, cancellationToken);
+        var command = new AddProductToIncomeCommand(incomeId, requests);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }
     
     private static async Task<IResult> DeleteProductFromIncome(
-        IIncomePublicService service,
+        IMediator mediator,
         int incomeId, 
-        [FromBody] IEnumerable<ProductToIncomeRequest> requests, 
+        [FromBody] IEnumerable<ProductToIncomeModel> requests, 
         CancellationToken cancellationToken)
     {
-        var result = await service.DeleteProductFromIncome(incomeId, requests, cancellationToken);
+        var command = new DeleteProductFromIncomeCommand(incomeId, requests);
+        var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
     }

@@ -1,6 +1,6 @@
 ﻿namespace AccounteeCommon.Options;
 
-public class PwdOptions
+public sealed class PwdOptions
 {
     public int HashSize { get; set; }
     public int SaltSize { get; set; }

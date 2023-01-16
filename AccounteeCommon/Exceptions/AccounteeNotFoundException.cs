@@ -2,7 +2,7 @@
 
 namespace AccounteeCommon.Exceptions;
 
-public class AccounteeNotFoundException : AccounteeException
+public sealed class AccounteeNotFoundException : AccounteeException
 {
     public AccounteeNotFoundException(string? message = null) : base(message){ }
 

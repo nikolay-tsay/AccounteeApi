@@ -69,6 +69,15 @@ namespace AccounteeCommon.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t delete yourself.
+        /// </summary>
+        public static string CannotDeleteSelf {
+            get {
+                return ResourceManager.GetString("CannotDeleteSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} doesn&apos;t exist in {1} with ID {2}.
         /// </summary>
         public static string ExpectedDoesNotExist {
