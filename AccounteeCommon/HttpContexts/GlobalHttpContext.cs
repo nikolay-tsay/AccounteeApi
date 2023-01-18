@@ -28,7 +28,7 @@ public static class GlobalHttpContext
     public static int GetCompanyId()
     {
         var items = HttpContextAccessor.HttpContext.Items;
-        if(!items.TryGetValue(ClaimNames.IgnoreCompanyFilter, out var companyId))
+        if(!items.TryGetValue(ClaimNames.CompanyId, out var companyId))
         {
             throw new AccounteeUnauthorizedException();
         }
