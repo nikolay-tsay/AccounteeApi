@@ -52,8 +52,12 @@ public sealed class EntityToResponseProfile : Profile
                     => opt.MapFrom(s => s.Items));
 
         CreateMap<CompanyEntity, CompanyResponse>();
-        
-        CreateMap<UserIncomeEntity, IncomeUserResponse>();
+
+        CreateMap<UserIncomeEntity, IncomeUserResponse>()
+            .ForMember(x => x.FirstName, opt 
+                => opt.MapFrom(x => x.User.FirstName))
+            .ForMember(x => x.LastName, opt 
+                => opt.MapFrom(x => x.User.LastName));
         CreateMap<IncomeProductEntity, IncomeProductResponse>();
         
         CreateMap<IncomeEntity, IncomeResponse>()

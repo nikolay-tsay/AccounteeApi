@@ -15,10 +15,8 @@ namespace AccounteeService.Extensions
             {
                 return source.Include(path);
             }
-            else
-            {
-                return source;
-            }
+
+            return source;
         }
 
         public static async Task<T> FirstOrNotFound<T>(this IQueryable<T> query, CancellationToken cancellationToken)
@@ -99,13 +97,9 @@ namespace AccounteeService.Extensions
     
         public static IOrderedQueryable<T> FilterOrder<T>(this IQueryable<T> query, OrderFilter orderFilter)
         {
-            if (orderFilter.OrderBy is null)
-            {
-                return (IOrderedQueryable<T>)query;
-            }
-        
+            var prop = orderFilter.OrderBy ?? "Id";
             var type = typeof(T);
-            var propInfo = type.GetProperty(orderFilter.OrderBy);
+            var propInfo = type.GetProperty(prop);
 
             if (propInfo is null)
             {
