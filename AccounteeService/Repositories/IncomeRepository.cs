@@ -67,40 +67,6 @@ public sealed class IncomeRepository : IIncomeRepository
         return result;
     }
 
-    // public async Task AddUserToIncome(IncomeEntity entity, UserEntity user, CurrentUser currentUser, bool save, CancellationToken cancellationToken)
-    // {
-    //     var currentIncomeUser = entity.UserIncomeList!
-    //         .FirstOrDefault(x => x.IdUser == user.Id);
-    //
-    //     if (currentIncomeUser != null)
-    //     {
-    //         throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
-    //             nameof(Resources.AlreadyExists), nameof(entity.UserIncomeList), nameof(IncomeEntity), entity.Id));
-    //     }
-    //
-    //     await AddUserIncome(entity, user, null, save, cancellationToken);
-    // }
-    //
-    // public async Task DeleteUserFromIncome(IncomeEntity entity, int userId, CurrentUser currentUser, bool save,
-    //     CancellationToken cancellationToken)
-    // {
-    //     var currentIncomeUser = entity.UserIncomeList!
-    //         .FirstOrDefault(x => x.IdUser == userId);
-    //
-    //     if (currentIncomeUser is null)
-    //     {
-    //         throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
-    //             nameof(Resources.ExpectedDoesNotExist), nameof(entity.UserIncomeList), nameof(IncomeEntity), entity.Id));
-    //     }
-    //
-    //     _context.UserIncomes.Remove(currentIncomeUser);
-    //
-    //     if (save)
-    //     {
-    //         await _context.SaveChangesAsync(cancellationToken);
-    //     }
-    // }
-
     public async Task AddProductToIncome(IncomeEntity entity, ProductEntity product, decimal amount, bool save, CancellationToken cancellationToken)
     {
         var currentIncomeProduct = entity.IncomeProductList!

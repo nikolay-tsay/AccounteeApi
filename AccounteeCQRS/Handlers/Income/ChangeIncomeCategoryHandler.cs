@@ -9,14 +9,14 @@ using MediatR;
 
 namespace AccounteeCQRS.Handlers.Income;
 
-public sealed class ChangeIncomeCategory : IRequestHandler<ChangeIncomeCategoryCommand, IncomeDetailResponse>
+public sealed class ChangeIncomeCategoryHandler : IRequestHandler<ChangeIncomeCategoryCommand, IncomeDetailResponse>
 {
     private readonly IIncomeRepository _incomeRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMapper _mapper;
 
-    public ChangeIncomeCategory(IIncomeRepository incomeRepository, ICategoryRepository categoryRepository, ICurrentUserService currentUserService, IMapper mapper)
+    public ChangeIncomeCategoryHandler(IIncomeRepository incomeRepository, ICategoryRepository categoryRepository, ICurrentUserService currentUserService, IMapper mapper)
     {
         _incomeRepository = incomeRepository;
         _categoryRepository = categoryRepository;

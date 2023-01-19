@@ -37,7 +37,7 @@ public sealed class DeleteUserFromIncomeHandler : IRequestHandler<DeleteUserFrom
         _currentUserService.CheckUserRights(currentUser.User, UserRights.CanEditOutlay);
         
         var income = await _incomeRepository.GetByIdDetail(request.Id, true, false, cancellationToken);
-        if (income!.IncomeProductList is null)
+        if (income!.UserIncomeList is null)
         {
             throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
                 nameof(Resources.ExpectedDoesNotExist), nameof(income.UserIncomeList), nameof(IncomeEntity), income.Id));
