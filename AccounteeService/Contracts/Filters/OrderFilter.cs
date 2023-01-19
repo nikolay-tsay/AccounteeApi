@@ -7,9 +7,7 @@ namespace AccounteeService.Contracts.Filters
         public static ValueTask<OrderFilter?> BindAsync(HttpContext context)
         {
             var propName = context.Request.Query["orderBy"];
-            var isDescending = bool.TryParse(context.Request.Query["isDescending"], out var value)
-                ? value
-                : false;
+            var isDescending = bool.TryParse(context.Request.Query["isDescending"], out var value) && value;
 
             var filter = new OrderFilter(propName, isDescending);
 

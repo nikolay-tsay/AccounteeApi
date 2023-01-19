@@ -37,6 +37,15 @@ public static class IncomeEndpoints
         group.MapDelete("/{incomeId}", DeleteIncome)
             .Produces<bool>();
 
+        group.MapPut("/{incomeId}/category/{categoryId}", ChangeIncomeCategory)
+            .Produces<IncomeDetailResponse>();
+
+        group.MapPost("/{incomeId}/user", AddUserToIncome)
+            .Produces<IncomeDetailResponse>();
+        
+        group.MapDelete("/{incomeId}/user", DeleteUserFromIncome)
+            .Produces<IncomeDetailResponse>();
+
         group.MapPost("/{incomeId}/product", AddProductToIncome)
             .Produces<IncomeDetailResponse>();
 
@@ -114,7 +123,43 @@ public static class IncomeEndpoints
 
         return Results.Ok(result);
     }
-    
+
+    private static async Task<IResult> ChangeIncomeCategory(
+        IMediator mediator,
+        int incomeId,
+        int categoryId,
+        CancellationToken cancellationToken)
+    {
+        var command = new ChangeIncomeCategoryCommand(incomeId, categoryId);
+        var result = await mediator.Send(command, cancellationToken);
+        
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> AddUserToIncome(
+        IMediator mediator,
+        int incomeId,
+        [FromBody] IEnumerable<UserToIncomeModel> requests,
+        CancellationToken cancellationToken)
+    {
+        var command = new AddUserToIncomeCommand(incomeId, requests);
+        var result = await mediator.Send(command, cancellationToken);
+
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> DeleteUserFromIncome(
+        IMediator mediator,
+        int incomeId,
+        [FromBody] IEnumerable<UserToIncomeModel> requests,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteUserFromIncomeCommand(incomeId, requests);
+        var result = await mediator.Send(command, cancellationToken);
+        
+        return Results.Ok(result);
+    }
+
     private static async Task<IResult> AddProductToIncome(
         IMediator mediator,
         int incomeId, 
