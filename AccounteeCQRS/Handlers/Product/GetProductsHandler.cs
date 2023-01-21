@@ -28,14 +28,14 @@ public sealed class GetProductsHandler : IRequestHandler<GetProductsQuery, Paged
     {
         await _currentUserService.CheckCurrentUserRights(UserRights.CanReadProducts, cancellationToken);
         
-        var product = await _productRepository
+        var products = await _productRepository
             .QueryAll(false)
             .Include(x => x.ProductCategory)
             .ApplySearch(request.SearchValue)
             .FilterOrder(request.OrderFilter)
-            .ToPagedList(request.PageFilter, cancellationToken);
+            .ToPagedListAsync(request.PageFilter, cancellationToken);
 
-        var mapped = _mappped.Map<PagedList<ProductResponse>>(product);
+        var mapped = _mappped.Map<PagedList<ProductResponse>>(products);
         return mapped;
     }
 }

@@ -37,7 +37,6 @@ public sealed class LoginHandler : IRequestHandler<LoginQuery, string>
 
         var token = _jwtService.GetJwtToken(user, cancellationToken);
         
-        GlobalHttpContext.SetCompanyId(user.IdCompany ?? -1);
         GlobalHttpContext.SetIgnoreCompanyFilter(false);
         return token;
     }

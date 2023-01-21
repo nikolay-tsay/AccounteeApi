@@ -31,7 +31,7 @@ public sealed class GetUsersHandler : IRequestHandler<GetUsersQuery, PagedList<U
             .QueryAll(false)
             .ApplySearch(request.SearchValue)
             .FilterOrder(request.OrderFilter)
-            .ToPagedList(request.PageFilter, cancellationToken);
+            .ToPagedListAsync(request.PageFilter, cancellationToken);
         
         var mapped = _mapper.Map<PagedList<UserResponse>>(users);
         return mapped;

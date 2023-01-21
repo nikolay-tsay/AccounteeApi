@@ -31,7 +31,7 @@ public sealed class GetIncomesHandler : IRequestHandler<GetIncomesQuery, PagedLi
             .QueryAll(false)
             .ApplySearch(request.SearchValue)
             .FilterOrder(request.OrderFilter)
-            .ToPagedList(request.PageFilter, cancellationToken);
+            .ToPagedListAsync(request.PageFilter, cancellationToken);
 
         var mapped = _mapper.Map<PagedList<IncomeResponse>>(incomes);
 

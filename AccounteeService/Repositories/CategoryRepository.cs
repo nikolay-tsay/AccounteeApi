@@ -16,7 +16,7 @@ public sealed class CategoryRepository : ICategoryRepository
         _context = context;
     }
     
-    public IQueryable<CategoryEntity> GetByTarget(CategoryTargets target)
+    public IQueryable<CategoryEntity> QueryByTarget(CategoryTargets target)
     {
         var query = _context.Categories
             .AsNoTracking()
@@ -31,7 +31,7 @@ public sealed class CategoryRepository : ICategoryRepository
             .TrackIf(track)
             .Where(x => x.Target == target)
             .Where(x => x.Id == id)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return category;
     }
@@ -42,7 +42,7 @@ public sealed class CategoryRepository : ICategoryRepository
             .TrackIf(track)
             .Where(x => x.Target == target)
             .Where(x => x.Name == name)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return category;
     }

@@ -139,10 +139,10 @@ public static class IncomeEndpoints
     private static async Task<IResult> AddUserToIncome(
         IMediator mediator,
         int incomeId,
-        [FromBody] IEnumerable<UserToIncomeModel> requests,
+        [FromBody] IEnumerable<UserToIncomeModel> models,
         CancellationToken cancellationToken)
     {
-        var command = new AddUserToIncomeCommand(incomeId, requests);
+        var command = new AddUserToIncomeCommand(incomeId, models);
         var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
@@ -151,10 +151,10 @@ public static class IncomeEndpoints
     private static async Task<IResult> DeleteUserFromIncome(
         IMediator mediator,
         int incomeId,
-        [FromBody] IEnumerable<UserToIncomeModel> requests,
+        [FromBody] IEnumerable<UserToIncomeModel> models,
         CancellationToken cancellationToken)
     {
-        var command = new DeleteUserFromIncomeCommand(incomeId, requests);
+        var command = new DeleteUserFromIncomeCommand(incomeId, models);
         var result = await mediator.Send(command, cancellationToken);
         
         return Results.Ok(result);
@@ -163,10 +163,10 @@ public static class IncomeEndpoints
     private static async Task<IResult> AddProductToIncome(
         IMediator mediator,
         int incomeId, 
-        [FromBody] IEnumerable<ProductToIncomeModel> requests,
+        [FromBody] IEnumerable<ProductToIncomeModel> models,
         CancellationToken cancellationToken)
     {
-        var command = new AddProductToIncomeCommand(incomeId, requests);
+        var command = new AddProductToIncomeCommand(incomeId, models);
         var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);
@@ -175,10 +175,10 @@ public static class IncomeEndpoints
     private static async Task<IResult> DeleteProductFromIncome(
         IMediator mediator,
         int incomeId, 
-        [FromBody] IEnumerable<ProductToIncomeModel> requests, 
+        [FromBody] IEnumerable<ProductToIncomeModel> models, 
         CancellationToken cancellationToken)
     {
-        var command = new DeleteProductFromIncomeCommand(incomeId, requests);
+        var command = new DeleteProductFromIncomeCommand(incomeId, models);
         var result = await mediator.Send(command, cancellationToken);
 
         return Results.Ok(result);

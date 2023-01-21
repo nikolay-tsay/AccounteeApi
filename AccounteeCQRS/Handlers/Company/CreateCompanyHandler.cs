@@ -53,7 +53,6 @@ public sealed class CreateCompanyHandler : IRequestHandler<CreateCompanyCommand,
         currentUser.User.Company = newCompany;
 
         await _companyRepository.SaveChanges(cancellationToken);
-        GlobalHttpContext.SetCompanyId(newCompany.Id);
         GlobalHttpContext.SetIgnoreCompanyFilter(false);
 
         var mapped = _mapper.Map<CompanyResponse>(newCompany);

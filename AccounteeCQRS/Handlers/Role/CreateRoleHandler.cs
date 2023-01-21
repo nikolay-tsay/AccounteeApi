@@ -40,7 +40,7 @@ public sealed class CreateRoleHandler : IRequestHandler<CreateRoleCommand, RoleR
         if (newRole is null)
         {
             throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
-                nameof(Resources.MappingError), new object[] {nameof(CreateRoleCommand), nameof(RoleEntity)}));
+                nameof(Resources.MappingError), nameof(CreateRoleCommand), nameof(RoleEntity)));
         }
 
         newRole.IdCompany = currentUser.User.IdCompany;

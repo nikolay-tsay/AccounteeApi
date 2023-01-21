@@ -27,18 +27,23 @@ public static class GlobalHttpContext
     
     public static int GetCompanyId()
     {
-        var items = HttpContextAccessor.HttpContext.Items;
-        if(!items.TryGetValue(ClaimNames.CompanyId, out var companyId))
+        var claimStr = HttpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimNames.CompanyId)?.Value;
+        if (!int.TryParse(claimStr, out var companyId))
+        {
+            throw new AccounteeUnauthorizedException();
+        }
+        
+        return companyId;
+    }
+    
+    public static int GetCurrentUserId()
+    {
+        var claimStr = HttpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimNames.UserId)?.Value;
+        if (!int.TryParse(claimStr, out var userId))
         {
             throw new AccounteeUnauthorizedException();
         }
 
-        return (int)companyId;
-    }
-    
-    public static void SetCompanyId(int id)
-    {
-        var items = HttpContextAccessor.HttpContext.Items;
-        items[ClaimNames.CompanyId] = id;
+        return userId;
     }
 }

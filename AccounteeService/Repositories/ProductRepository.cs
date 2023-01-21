@@ -29,7 +29,7 @@ public sealed class ProductRepository : IProductRepository
             .TrackIf(track)
             .Include(x => x.ProductCategory)
             .Where(x => x.Id == id)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }
@@ -40,7 +40,7 @@ public sealed class ProductRepository : IProductRepository
             .TrackIf(track)
             .Include(x => x.ProductCategory)
             .Where(x => x.Name == name)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }

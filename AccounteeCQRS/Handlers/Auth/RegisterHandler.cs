@@ -29,8 +29,7 @@ public sealed class RegisterHandler : IRequestHandler<RegisterCommand, RegisterR
     {
         GlobalHttpContext.SetIgnoreCompanyFilter(true);
 
-        var existingUser = await _userRepository.GetByLogin(request.Login, true, false, cancellationToken);
-
+        var existingUser = await _userRepository.GetByLogin(request.Login, false, true, cancellationToken);
         if (existingUser is not null)
         {
             throw new AccounteeException(ResourceRetriever.Get(CultureInfo.CurrentCulture,

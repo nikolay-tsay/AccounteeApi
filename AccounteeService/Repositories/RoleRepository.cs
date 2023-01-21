@@ -27,7 +27,7 @@ public sealed class RoleRepository : IRoleRepository
         var result = await _context.Roles
             .TrackIf(track)
             .Where(x => x.Id == id)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }
@@ -37,7 +37,7 @@ public sealed class RoleRepository : IRoleRepository
         var result = await _context.Roles
             .TrackIf(track)
             .Where(x => x.Name == name)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }

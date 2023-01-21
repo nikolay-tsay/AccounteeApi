@@ -1,9 +1,8 @@
 ﻿using AccounteeDomain.Entities;
 
-namespace AccounteeService.Services.Interfaces
+namespace AccounteeService.Services.Interfaces;
+
+public interface IJwtService
 {
-    public interface IJwtService
-    {
-        string GetJwtToken(UserEntity user, CancellationToken cancellationToken);
-    }
+    string GetJwtToken(UserEntity user, CancellationToken cancellationToken);
 }

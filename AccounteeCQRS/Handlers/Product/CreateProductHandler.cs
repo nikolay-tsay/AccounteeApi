@@ -40,7 +40,7 @@ public sealed class CreateProductHandler : IRequestHandler<CreateProductCommand,
         if (newProduct is null)
         {
             throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture,
-                nameof(Resources.MappingError), new object[] {nameof(CreateProductCommand), nameof(ProductEntity)}));
+                nameof(Resources.MappingError), nameof(CreateProductCommand), nameof(ProductEntity)));
         }
 
         newProduct.IdCompany = currentUser.User.IdCompany;

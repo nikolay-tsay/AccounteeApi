@@ -31,7 +31,7 @@ public sealed class GetServicesHandler : IRequestHandler<GetServicesQuery, Paged
             .QueryAll(false)
             .ApplySearch(request.SearchValue)
             .FilterOrder(request.OrderFilter)
-            .ToPagedList(request.PageFilter, cancellationToken);
+            .ToPagedListAsync(request.PageFilter, cancellationToken);
         
         var mapped = _mapper.Map<PagedList<ServiceResponse>>(services);
         return mapped;

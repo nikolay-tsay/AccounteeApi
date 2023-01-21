@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using AccounteeCommon.Exceptions;
+using AccounteeCommon.HttpContexts;
 using AccounteeCommon.Resources;
 using AccounteeCQRS.Requests.Auth;
 using AccounteeService.Repositories.Interfaces;
@@ -10,13 +11,11 @@ namespace AccounteeCQRS.Handlers.Auth;
 
 public sealed class ChangePasswordHandler : IRequestHandler<ChangePasswordCommand, bool>
 {
-    private readonly ICurrentUserService _currentUserService;
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHandler _passwordHandler;
 
-    public ChangePasswordHandler(ICurrentUserService currentUserService, IPasswordHandler passwordHandler, IUserRepository userRepository)
+    public ChangePasswordHandler(IPasswordHandler passwordHandler, IUserRepository userRepository)
     {
-        _currentUserService = currentUserService;
         _passwordHandler = passwordHandler;
         _userRepository = userRepository;
     }
@@ -26,7 +25,7 @@ public sealed class ChangePasswordHandler : IRequestHandler<ChangePasswordComman
         var userId = request.UserId;
         if (userId is null)
         {
-            userId = _currentUserService.GetCurrentUserId();
+            userId = GlobalHttpContext.GetCurrentUserId();
         }
 
         var user = await _userRepository.GetById(userId.Value, false, true, cancellationToken);

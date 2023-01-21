@@ -1,11 +1,14 @@
-﻿namespace AccounteeApi.Middleware;
+﻿using Newtonsoft.Json;
 
-public class ErrorResponse
+namespace AccounteeApi.Middleware;
+
+public sealed class ErrorResponse
 {
-    public string ErrorMessage { get; set; }
+    public int StatusCode { get; init; }
+    public string? ErrorMessage { get; init; }
 
-    public ErrorResponse(string errorMessage)
+    public override string ToString()
     {
-        ErrorMessage = errorMessage;
+        return JsonConvert.SerializeObject(this);
     }
 }

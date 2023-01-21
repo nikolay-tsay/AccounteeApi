@@ -30,7 +30,7 @@ public sealed class ServiceRepository : IServiceRepository
             .TrackIf(track)
             .Include(x => x.ServiceCategory)
             .Where(x => x.Id == id)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }
@@ -42,7 +42,7 @@ public sealed class ServiceRepository : IServiceRepository
             .Include(x => x.ServiceProductList)!
                 .ThenInclude(x => x.Product)
             .Where(x => x.Id == id)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }
@@ -52,7 +52,7 @@ public sealed class ServiceRepository : IServiceRepository
         var result = await _context.Services
             .TrackIf(track)
             .Where(x => x.Name == name)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }

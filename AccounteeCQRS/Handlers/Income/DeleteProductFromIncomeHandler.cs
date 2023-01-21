@@ -37,15 +37,14 @@ public sealed class DeleteProductFromIncomeHandler : IRequestHandler<DeleteProdu
         if (income!.IncomeProductList is null)
         {
             throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture, 
-                nameof(Resources.ExpectedDoesNotExist), 
-                new object[] {nameof(income.IncomeProductList), nameof(IncomeEntity), income.Id}));
+                nameof(Resources.ExpectedDoesNotExist), nameof(income.IncomeProductList), nameof(IncomeEntity), income.Id));
         }
 
         foreach (var incomeProduct in request.Products)
         {
-            var toDelete = income.IncomeProductList
+            var toDelete = await income.IncomeProductList
                 .Where(x => x.IdProduct == incomeProduct.Id)
-                .FirstOrNotFound();
+                .FirstOrNotFoundAsync(cancellationToken);
 
             await _incomeRepository.DeleteProductFromIncome(income, toDelete, incomeProduct.Amount, false, cancellationToken);
         }

@@ -45,9 +45,9 @@ public sealed class DeleteUserFromIncomeHandler : IRequestHandler<DeleteUserFrom
 
         foreach (var incomeUser in request.Users)
         {
-            var toDelete = income.UserIncomeList!
+            var toDelete = await income.UserIncomeList!
                 .Where(x => x.IdUser == incomeUser.Id)
-                .FirstOrNotFound();
+                .FirstOrNotFoundAsync(cancellationToken);
 
             _context.UserIncomes.Remove(toDelete);
         }

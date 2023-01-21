@@ -31,7 +31,7 @@ public sealed class GetRolesHandler : IRequestHandler<GetRolesQuery, PagedList<R
             .QueryAll(false)
             .ApplySearch(request.SearchValue)
             .FilterOrder(request.OrderFilter)
-            .ToPagedList(request.PageFilter, cancellationToken);
+            .ToPagedListAsync(request.PageFilter, cancellationToken);
         
         var result = _mapper.Map<PagedList<RoleResponse>>(roles);
         return result;

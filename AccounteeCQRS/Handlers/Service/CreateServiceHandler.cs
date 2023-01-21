@@ -40,7 +40,7 @@ public sealed class CreateServiceHandler : IRequestHandler<CreateServiceCommand,
         if (newService is null)
         { 
             throw new AccounteeException(ResourceRetriever.Get(currentUser.Culture,
-                nameof(Resources.MappingError), new object[] {nameof(CreateServiceCommand), nameof(ServiceEntity)}));
+                nameof(Resources.MappingError), nameof(CreateServiceCommand), nameof(ServiceEntity)));
         }
         
         newService.IdCompany = currentUser.User.IdCompany;

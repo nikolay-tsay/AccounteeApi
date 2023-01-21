@@ -29,7 +29,7 @@ public sealed class IncomeRepository : IIncomeRepository
     public IQueryable<IncomeEntity> QueryByUser(int userId, bool track)
     {
         var query = _context.UserIncomes
-            .AsNoTracking()
+            .TrackIf(track)
             .Include(x => x.Income.IncomeCategory)
             .Include(x => x.Income.Service)
             .Where(x => x.IdUser == userId)
@@ -45,7 +45,7 @@ public sealed class IncomeRepository : IIncomeRepository
             .Include(x => x.IncomeCategory)
             .Include(x => x.Service)
             .Where(x => x.Id == id)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }
@@ -62,7 +62,7 @@ public sealed class IncomeRepository : IIncomeRepository
                 .ThenInclude(x => x.Product)
             .Where(x => x.Id == id)
             .AsSplitQuery()
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return result;
     }

@@ -5,7 +5,7 @@ namespace AccounteeService.Repositories.Interfaces;
 
 public interface ICategoryRepository
 {
-    IQueryable<CategoryEntity> GetByTarget(CategoryTargets target);
+    IQueryable<CategoryEntity> QueryByTarget(CategoryTargets target);
     Task<CategoryEntity?> GetById(int id, CategoryTargets target, bool track, bool allowNull, CancellationToken cancellationToken);
     Task<CategoryEntity?> GetByName(string name, CategoryTargets target, bool track, bool allowNull, CancellationToken cancellationToken);
     Task AddCategory(CategoryEntity toAdd, bool save, CancellationToken cancellationToken);

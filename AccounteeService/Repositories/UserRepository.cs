@@ -30,7 +30,7 @@ public sealed class UserRepository : IUserRepository
             .Include(x => x.Role)
             .Include(x => x.Company)
             .Where(x => x.Id == id)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return user;
     }
@@ -42,7 +42,7 @@ public sealed class UserRepository : IUserRepository
             .Include(x => x.Role)
             .Include(x => x.Company)
             .Where(x => x.Login == login)
-            .FirstAllowNull(allowNull, cancellationToken);
+            .FirstAllowNullAsync(allowNull, cancellationToken);
 
         return user;
     }

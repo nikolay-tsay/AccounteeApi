@@ -7,7 +7,6 @@ namespace AccounteeCQRS.Requests.Category;
 
 public record CreateCategoryCommand : IRequest<CategoryResponse>
 {
-    public int Id { get; init; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CategoryTargets Target { get; init; }
     public required string Name { get; init; } 

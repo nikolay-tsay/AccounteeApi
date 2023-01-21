@@ -28,10 +28,10 @@ public sealed class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, P
         await _currentUserService.CheckCurrentUserRights(UserRights.CanReadCategories, cancellationToken);
 
         var categories = await _categoryRepository
-            .GetByTarget(request.Target)
+            .QueryByTarget(request.Target)
             .ApplySearch(request.SearchValue)
             .FilterOrder(request.OrderFilter)
-            .ToPagedList(request.PageFilter, cancellationToken);
+            .ToPagedListAsync(request.PageFilter, cancellationToken);
 
         var mapped = _mapper.Map<PagedList<CategoryResponse>>(categories);
         return mapped;
